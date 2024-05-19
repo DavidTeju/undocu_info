@@ -1,0 +1,642 @@
+[
+  {
+    "State": "WV",
+    "College Name": "Alderson Broaddus University"
+  },
+  {
+    "State": "DC",
+    "College Name": "American University"
+  },
+  {
+    "State": "US",
+    "College Name": "American University Bulgaria"
+  },
+  {
+    "State": "MA",
+    "College Name": "Amherst College"
+  },
+  {
+    "State": "CA",
+    "College Name": "Art Center College Of Design"
+  },
+  {
+    "State": "NY",
+    "College Name": "Bard College"
+  },
+  {
+    "State": "MA",
+    "College Name": "Bard College Simons Rock Early College"
+  },
+  {
+    "State": "ME",
+    "College Name": "Bates College"
+  },
+  {
+    "State": "IN",
+    "College Name": "Bethel College"
+  },
+  {
+    "State": "CA",
+    "College Name": "Biola University"
+  },
+  {
+    "State": "MA",
+    "College Name": "Boston College"
+  },
+  {
+    "State": "MA",
+    "College Name": "Brandeis University"
+  },
+  {
+    "State": "NC",
+    "College Name": "Brevard College"
+  },
+  {
+    "State": "ID",
+    "College Name": "Brigham Young University Idaho"
+  },
+  {
+    "State": "RI",
+    "College Name": "Bryant University"
+  },
+  {
+    "State": "CA",
+    "College Name": "California State University Chico"
+  },
+  {
+    "State": "CA",
+    "College Name": "California State University Dominguez Hills"
+  },
+  {
+    "State": "MA",
+    "College Name": "Cambridge College"
+  },
+  {
+    "State": "MN",
+    "College Name": "Carleton College"
+  },
+  {
+    "State": "CA",
+    "College Name": "Chapman University"
+  },
+  {
+    "State": "SC",
+    "College Name": "Coastal Carolina University"
+  },
+  {
+    "State": "NY",
+    "College Name": "Colgate University"
+  },
+  {
+    "State": "SC",
+    "College Name": "College Of Charleston"
+  },
+  {
+    "State": "NY",
+    "College Name": "College Of Staten Island Cuny"
+  },
+  {
+    "State": "CO",
+    "College Name": "Colorado College"
+  },
+  {
+    "State": "CO",
+    "College Name": "Colorado State University"
+  },
+  {
+    "State": "WV",
+    "College Name": "Concord University"
+  },
+  {
+    "State": "MN",
+    "College Name": "Concordia University St Paul"
+  },
+  {
+    "State": "NE",
+    "College Name": "Creighton University"
+  },
+  {
+    "State": "SD",
+    "College Name": "Dakota State University"
+  },
+  {
+    "State": "GA",
+    "College Name": "Dalton State College"
+  },
+  {
+    "State": "NH",
+    "College Name": "Dartmouth College"
+  },
+  {
+    "State": "OH",
+    "College Name": "Denison University"
+  },
+  {
+    "State": "WA",
+    "College Name": "Digipen Institute Of Technology"
+  },
+  {
+    "State": "UT",
+    "College Name": "Dixie State University"
+  },
+  {
+    "State": "IL",
+    "College Name": "Dominican University"
+  },
+  {
+    "State": "GA",
+    "College Name": "Emory University"
+  },
+  {
+    "State": "NY",
+    "College Name": "Eugene Lang College The New School For Liberal Arts"
+  },
+  {
+    "State": "NY",
+    "College Name": "Fashion Institute Of Technology"
+  },
+  {
+    "State": "MA",
+    "College Name": "Fitchburg State University"
+  },
+  {
+    "State": "FL",
+    "College Name": "Florida Southern College"
+  },
+  {
+    "State": "OR",
+    "College Name": "George Fox University"
+  },
+  {
+    "State": "DC",
+    "College Name": "George Washington University"
+  },
+  {
+    "State": "DC",
+    "College Name": "Georgetown University"
+  },
+  {
+    "State": "CA",
+    "College Name": "Harvey Mudd College"
+  },
+  {
+    "State": "DC",
+    "College Name": "Howard University"
+  },
+  {
+    "State": "IL",
+    "College Name": "Illinois Institute Technology"
+  },
+  {
+    "State": "IN",
+    "College Name": "Indiana University South Bend"
+  },
+  {
+    "State": "IN",
+    "College Name": "Indiana University Southeast"
+  },
+  {
+    "State": "NY",
+    "College Name": "Ithaca College"
+  },
+  {
+    "State": "VA",
+    "College Name": "James Madison University"
+  },
+  {
+    "State": "PA",
+    "College Name": "Juniata College"
+  },
+  {
+    "State": "SC",
+    "College Name": "Lander University"
+  },
+  {
+    "State": "PA",
+    "College Name": "Lincoln University"
+  },
+  {
+    "State": "MD",
+    "College Name": "Mcdaniel College"
+  },
+  {
+    "State": "CA",
+    "College Name": "Menlo College"
+  },
+  {
+    "State": "NC",
+    "College Name": "Methodist University"
+  },
+  {
+    "State": "CO",
+    "College Name": "Metropolitan State University Of Denver"
+  },
+  {
+    "State": "MI",
+    "College Name": "Michigan State University"
+  },
+  {
+    "State": "TN",
+    "College Name": "Middle Tennessee State University"
+  },
+  {
+    "State": "PA",
+    "College Name": "Millersville University"
+  },
+  {
+    "State": "ND",
+    "College Name": "Minot State University"
+  },
+  {
+    "State": "ND",
+    "College Name": "Minot State University"
+  },
+  {
+    "State": "NJ",
+    "College Name": "Monmouth University"
+  },
+  {
+    "State": "MA",
+    "College Name": "Mount Holyoke College"
+  },
+  {
+    "State": "IL",
+    "College Name": "National Louis University"
+  },
+  {
+    "State": "NM",
+    "College Name": "New Mexico State University"
+  },
+  {
+    "State": "NY",
+    "College Name": "New York Institute Technology Nyit"
+  },
+  {
+    "State": "KS",
+    "College Name": "Newman University"
+  },
+  {
+    "State": "VA",
+    "College Name": "Norfolk State University"
+  },
+  {
+    "State": "IL",
+    "College Name": "Northeastern Illinois University"
+  },
+  {
+    "State": "AZ",
+    "College Name": "Northern Arizona University"
+  },
+  {
+    "State": "IL",
+    "College Name": "Northern Illinois University"
+  },
+  {
+    "State": "IL",
+    "College Name": "Northwestern University"
+  },
+  {
+    "State": "VT",
+    "College Name": "Norwich University"
+  },
+  {
+    "State": "OH",
+    "College Name": "Oberlin College Arts And Sciences"
+  },
+  {
+    "State": "OH",
+    "College Name": "Oberlin College Arts And Sciences"
+  },
+  {
+    "State": "FL",
+    "College Name": "Palm Beach Atlantic University"
+  },
+  {
+    "State": "CA",
+    "College Name": "Point Loma Nazarene University"
+  },
+  {
+    "State": "CA",
+    "College Name": "Pomona College"
+  },
+  {
+    "State": "MO",
+    "College Name": "Research College Of Nursing"
+  },
+  {
+    "State": "RI",
+    "College Name": "Rhode Island College"
+  },
+  {
+    "State": "TX",
+    "College Name": "Rice University"
+  },
+  {
+    "State": "MT",
+    "College Name": "Rocky Mountain College"
+  },
+  {
+    "State": "NC",
+    "College Name": "Saint Augustines University"
+  },
+  {
+    "State": "MO",
+    "College Name": "Saint Louis University"
+  },
+  {
+    "State": "CA",
+    "College Name": "San Diego Christian College"
+  },
+  {
+    "State": "CA",
+    "College Name": "San Diego State University"
+  },
+  {
+    "State": "MA",
+    "College Name": "School Of The Museum Of Fine Arts Boston"
+  },
+  {
+    "State": "NY",
+    "College Name": "School Of Visual Arts"
+  },
+  {
+    "State": "NJ",
+    "College Name": "Seton Hall University"
+  },
+  {
+    "State": "PA",
+    "College Name": "Seton Hill University"
+  },
+  {
+    "State": "MA",
+    "College Name": "Smith College"
+  },
+  {
+    "State": "IL",
+    "College Name": "Southern Illinois University Edwardsville"
+  },
+  {
+    "State": "FL",
+    "College Name": "Stetson University"
+  },
+  {
+    "State": "NY",
+    "College Name": "Suny College Old Westbury"
+  },
+  {
+    "State": "NY",
+    "College Name": "Suny University Albany"
+  },
+  {
+    "State": "PA",
+    "College Name": "Susquehanna University"
+  },
+  {
+    "State": "PA",
+    "College Name": "Swarthmore College"
+  },
+  {
+    "State": "NY",
+    "College Name": "Syracuse University"
+  },
+  {
+    "State": "AL",
+    "College Name": "Talladega College"
+  },
+  {
+    "State": "TN",
+    "College Name": "Tennessee Technological University"
+  },
+  {
+    "State": "TX",
+    "College Name": "Texas Am University College Station"
+  },
+  {
+    "State": "TX",
+    "College Name": "Texas State University"
+  },
+  {
+    "State": "NM",
+    "College Name": "The University Of New Mexico"
+  },
+  {
+    "State": "MD",
+    "College Name": "Towson University"
+  },
+  {
+    "State": "CT",
+    "College Name": "Trinity College"
+  },
+  {
+    "State": "CA",
+    "College Name": "University Of California Santa Barbara"
+  },
+  {
+    "State": "AR",
+    "College Name": "University Of Central Arkansas"
+  },
+  {
+    "State": "OH",
+    "College Name": "University Of Cincinnati"
+  },
+  {
+    "State": "CO",
+    "College Name": "University Of Colorado Boulder"
+  },
+  {
+    "State": "CO",
+    "College Name": "University Of Colorado Colorado Springs"
+  },
+  {
+    "State": "DE",
+    "College Name": "University Of Delaware"
+  },
+  {
+    "State": "CO",
+    "College Name": "University Of Denver"
+  },
+  {
+    "State": "HI",
+    "College Name": "University Of Hawaii At Hilo"
+  },
+  {
+    "State": "TX",
+    "College Name": "University Of Houston"
+  },
+  {
+    "State": "TX",
+    "College Name": "University Of Houston Victoria"
+  },
+  {
+    "State": "IL",
+    "College Name": "University Of Illinois Springfield"
+  },
+  {
+    "State": "IN",
+    "College Name": "University Of Indianapolis"
+  },
+  {
+    "State": "KS",
+    "College Name": "University Of Kansas"
+  },
+  {
+    "State": "LA",
+    "College Name": "University Of Louisiana At Lafayette"
+  },
+  {
+    "State": "VA",
+    "College Name": "University Of Lynchburg"
+  },
+  {
+    "State": "MD",
+    "College Name": "University Of Maryland Baltimore County"
+  },
+  {
+    "State": "MA",
+    "College Name": "University Of Massachusetts Boston"
+  },
+  {
+    "State": "MN",
+    "College Name": "University Of Minnesota At Crookston"
+  },
+  {
+    "State": "MO",
+    "College Name": "University Of Missouri"
+  },
+  {
+    "State": "NV",
+    "College Name": "University Of Nevada Reno"
+  },
+  {
+    "State": "NC",
+    "College Name": "University Of North Carolina Chapel Hill"
+  },
+  {
+    "State": "NC",
+    "College Name": "University Of North Carolina Charlotte"
+  },
+  {
+    "State": "GA",
+    "College Name": "University Of North Georgia"
+  },
+  {
+    "State": "CO",
+    "College Name": "University Of Northern Colorado"
+  },
+  {
+    "State": "IA",
+    "College Name": "University Of Northern Iowa"
+  },
+  {
+    "State": "OK",
+    "College Name": "University Of Oklahoma"
+  },
+  {
+    "State": "CA",
+    "College Name": "University Of Pacific"
+  },
+  {
+    "State": "OR",
+    "College Name": "University Of Portland"
+  },
+  {
+    "State": "WA",
+    "College Name": "University Of Puget Sound"
+  },
+  {
+    "State": "OK",
+    "College Name": "University Of Sciences"
+  },
+  {
+    "State": "PA",
+    "College Name": "University Of Scranton"
+  },
+  {
+    "State": "SC",
+    "College Name": "University Of South Carolina Columbia"
+  },
+  {
+    "State": "VT",
+    "College Name": "University Of Vermont"
+  },
+  {
+    "State": "CA",
+    "College Name": "University Of West"
+  },
+  {
+    "State": "WI",
+    "College Name": "University Of Wisconsin Oshkosh"
+  },
+  {
+    "State": "WI",
+    "College Name": "University Of Wisconsin Stout"
+  },
+  {
+    "State": "WI",
+    "College Name": "University Of Wisconsin Whitewater"
+  },
+  {
+    "State": "WI",
+    "College Name": "University Of Wisconsin Whitewater"
+  },
+  {
+    "State": "OH",
+    "College Name": "Ursuline College"
+  },
+  {
+    "State": "OH",
+    "College Name": "Ursuline College"
+  },
+  {
+    "State": "UT",
+    "College Name": "Utah State University"
+  },
+  {
+    "State": "UT",
+    "College Name": "Utah Valley University"
+  },
+  {
+    "State": "NY",
+    "College Name": "Vassar College"
+  },
+  {
+    "State": "WA",
+    "College Name": "Washington State University"
+  },
+  {
+    "State": "MO",
+    "College Name": "Washington University of St Louis"
+  },
+  {
+    "State": "MI",
+    "College Name": "Wayne State University"
+  },
+  {
+    "State": "NY",
+    "College Name": "Wells College"
+  },
+  {
+    "State": "CT",
+    "College Name": "Wesleyan University"
+  },
+  {
+    "State": "KY",
+    "College Name": "Western Kentucky University"
+  },
+  {
+    "State": "WA",
+    "College Name": "Western Washington University"
+  },
+  {
+    "State": "CA",
+    "College Name": "Whittier College"
+  },
+  {
+    "State": "MA",
+    "College Name": "Williams College"
+  },
+  {
+    "State": "NC",
+    "College Name": "Wingate University"
+  }
+]
