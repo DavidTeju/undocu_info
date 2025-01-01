@@ -6,7 +6,11 @@
 	import { isEqual } from 'lodash-es';
 	import type { colleges as College } from '@prisma/client';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const collegesByState = data.collegesByState;
 

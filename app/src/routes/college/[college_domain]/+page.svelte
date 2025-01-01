@@ -6,7 +6,11 @@
 	import type { PageData } from './$types';
 	import prisma from '$lib/prisma';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const { college, domain } = data;
 </script>
