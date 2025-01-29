@@ -33,7 +33,12 @@
 	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^6.1.0",
+		"@supabase/supabase-js": "^2.47.10",
+		"@tailwindcss/vite": "^4.0.0",
 		"anchorme": "^3.0.8",
-		"lodash-es": "^4.17.21"
+		"lodash-es": "^4.17.21",
+		"normalize.css": "^8.0.1",
+		"sass": "^1.83.4",
+		"tailwindcss": "^4.0.0"
 	}
 }

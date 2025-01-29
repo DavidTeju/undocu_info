@@ -12,7 +12,7 @@
 
 	let { data }: Props = $props();
 
-	const collegesByState = data.collegesByState;
+	const { collegesByState } = data;
 
 	// let collegeList = data.colleges
 	// let toShow: College[] = [];
