@@ -33,7 +33,8 @@ export default [
 	{
 		rules: {
 			'array-callback-return': 'error',
-			'no-template-curly-in-string': 'warn'
+			'no-template-curly-in-string': 'warn',
+			'no-control-regex': 0
 		}
 	}
 ];
