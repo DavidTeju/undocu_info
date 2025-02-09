@@ -34,8 +34,10 @@
 	"dependencies": {
 		"@prisma/client": "^6.3.1",
 		"@supabase/supabase-js": "^2.47.10",
+		"@sveltejs/adapter-node": "^5.2.12",
 		"@tailwindcss/vite": "^4.0.0",
 		"anchorme": "^3.0.8",
+		"dotenv": "^16.4.7",
 		"lodash-es": "^4.17.21",
 		"normalize.css": "^8.0.1",
 		"sass": "^1.83.4",
