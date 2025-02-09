@@ -27,7 +27,12 @@ export const load: PageServerLoad = async ({ params }) => {
 		}))
 	);
 
+	const collegeName = await prisma.colleges.findUnique({
+		where: { domain: params.college_domain },
+		select: { name: true }
+	}).then(college => college?.name || null);
+
 	const questionsCategorized = Object.groupBy(questions, q => q.category);
 
-	return { questionsCategorized };
+	return { questionsCategorized, collegeName };
 };

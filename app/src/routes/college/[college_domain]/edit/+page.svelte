@@ -1,16 +1,12 @@
 <script lang="ts">
 	import question_categories from '$lib/question_categories.json';
-	import type { PageData } from './$types';
 	import type { Session } from '@supabase/supabase-js';
 	import { supabase } from '$lib/supabaseClient';
 	import { validEmailRegex } from '$lib/utils';
 
-	interface Props {
-		data: PageData;
-	}
 
-	let { data }: Props = $props();
-	const { questionsCategorized } = data;
+	let { data } = $props();
+	const { questionsCategorized, collegeName } = data;
 
 	let email = $state('');
 	let otp = $state('');
@@ -48,36 +44,58 @@
 	};
 </script>
 
-<p>To suggest edits, please confirm your email address. This can be used to verify your identity.
-	If you work with the school in question, please use your work/.edu email address. I may contact you
-	via email to verify the information you input</p>
-<p>{email}</p>
-{#if !isVerified}
-	<label for="email">Email Address:</label>
-	<input bind:value={email} type="email" id="email" name="email" required>
-	<button disabled={!isValidEmail} onclick={verifyEmail}>Send one time pin</button>
-	{#if otpSent}
-		<label for="otp">One Time Pin:</label>
-		<input bind:value={otp} type="text" id="otp" name="otp" required>
-		<button disabled={otp.length !== 6} onclick={verifyOtp}>Verify</button>
+<main>
+	<h1>Suggest An Edit To {collegeName}</h1>
+	<p>To suggest edits, please confirm your email address. This can be used to verify your identity.
+		If you work with the school in question, please use your work/.edu email address. I may contact you
+		via email to verify the information you input</p>
+	<p>{email}</p>
+	{#if !isVerified}
+		<label for="email">Email Address:</label>
+		<input bind:value={email} type="email" id="email" name="email" required>
+		<button disabled={!isValidEmail} onclick={verifyEmail}>Send one time pin</button>
+		{#if otpSent}
+			<label for="otp">One Time Pin:</label>
+			<input bind:value={otp} type="text" id="otp" name="otp" required>
+			<button disabled={otp.length !== 6} onclick={verifyOtp}>Verify</button>
+		{/if}
+	{:else}
+		<p>Verified!</p>
 	{/if}
-{:else}
-	<p>Verified!</p>
-{/if}
 
-<form>
-	{#each Object.entries(question_categories) as [category, categoryText]}
-		<fieldset disabled={!isVerified}>
-			<legend>{categoryText}</legend>
-			{#if questionsCategorized[category]}
-				{#each questionsCategorized[category] as { id, question, response }}
-					<label for={id.toString()}>
-						{question}
-					</label>
-					<textarea id="{id.toString()}">{response}</textarea>
-				{/each}
-			{/if}
-		</fieldset>
-	{/each}
-	<button type="submit">Submit</button>
-</form>
+	<form>
+		{#each Object.entries(question_categories) as [category, categoryText]}
+			<fieldset disabled={!isVerified}>
+				<legend>{categoryText}</legend>
+				{#if questionsCategorized[category]}
+					{#each questionsCategorized[category] as { id, question, response }}
+						<label for={id.toString()}>
+							{question}
+						</label>
+						<textarea id="{id.toString()}">{response}</textarea>
+					{/each}
+				{/if}
+			</fieldset>
+		{/each}
+		<button type="submit">Submit</button>
+	</form>
+</main>
+
+<style lang="scss">
+  main {
+    padding: 1rem clamp(1rem, 15vw, 10rem);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  fieldset {
+    margin-bottom: 1rem;
+  }
+
+  textarea {
+    width: 100%;
+  }
+</style>
