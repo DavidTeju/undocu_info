@@ -25,7 +25,11 @@ export const load: PageServerLoad = async () => {
 	}, {} as Record<string, Array<typeof colleges[0]>>);
 
 	const collegesByStateSorted = Object.entries(collegesByState)
-		.sort(([stateA], [stateB]) => stateA.localeCompare(stateB))
+		.sort(([stateA], [stateB]) => stateA === 'Unknown'
+			? 1
+			: stateB === 'Unknown'
+				? -1
+				: stateA.localeCompare(stateB))
 		.map(([state, colleges]) => ({
 			state,
 			colleges
