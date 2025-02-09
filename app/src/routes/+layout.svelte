@@ -8,6 +8,7 @@
 	<div class="page-wrapper">
 		<nav>
 			<p class="site-title"><a href='/'>Undocu-Info</a></p>
+			<p class="source-code"><a href="https://github.com/DavidTeju/undocu_info">Source Code</a></p>
 		</nav>
 		{@render children()}
 	</div>
@@ -43,22 +44,50 @@
     color: #272838
   }
 
+  nav {
+    display: flex;
+    border-bottom: dashed 1px #272838;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    padding: 1.25rem min(2rem, 5vw) 0.5rem;
+
+    p {
+      margin: 0;
+
+      a {
+        color: #272838;
+      }
+
+      &.source-code {
+        &::before {
+          content: "";
+          background-image: url("/github-mark.svg");
+          background-size: 1rem;
+          background-repeat: no-repeat;
+          display: inline-block;
+          width: 1rem;
+          height: 1rem;
+          vertical-align: middle;
+          margin-right: .2rem;
+        }
+
+        font-size: .8rem;
+      }
+    }
+  }
+
   .site-title {
     font-family: "Roboto", serif;
     font-optical-sizing: auto;
     font-style: normal;
     font-size: 1.75rem;
     font-weight: 700;
-    //text-align: center;
-    padding: 1.25rem 2rem .5rem;
-    //text-decoration: underline;
-    border-bottom: dashed 1px #272838;
+    //padding: 1.25rem 2rem .5rem;
     background-color: inherit;
-    //color: #FBF5F2;
-    /*border-bottom: 1px solid #e0e0e0;*/
+
     a {
       border: none;
-			color: #272838;
     }
   }
 

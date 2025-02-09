@@ -21,7 +21,7 @@
 </script>
 
 <main
-	style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('http://127.0.0.1:54321/storage/v1/object/public/campuses/generic1.webp');">
+	style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('http://127.0.0.1:54321/storage/v1/object/public/campuses/generic');">
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">
@@ -60,6 +60,10 @@
 
   li {
     margin-bottom: .5rem;
+
+    :global(p) {
+      margin: .5rem 0;
+    }
   }
 
   main {
@@ -73,16 +77,17 @@
 
     opacity: 0;
     visibility: hidden;
-    animation: fadeIn .7s ease forwards;  }
+    animation: fadeIn .7s ease forwards;
+  }
 
   @keyframes fadeIn {
     0% {
       opacity: 0;
       visibility: hidden;
     }
-		75%{
-			opacity: 0;
-		}
+    75% {
+      opacity: 0;
+    }
     100% {
       opacity: 1;
       visibility: visible;
