@@ -14,7 +14,6 @@
 </div>
 
 <style lang="scss">
-  @import "tailwindcss";
   @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
   .background {
@@ -59,6 +58,7 @@
     /*border-bottom: 1px solid #e0e0e0;*/
     a {
       border: none;
+			color: #272838;
     }
   }
 

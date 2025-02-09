@@ -13,6 +13,7 @@ model colleges {
   domain         String           @unique
   city           String?
   state          String?
+  Suggestions    Suggestions[]
   emailaddresses emailaddresses[]
   responses      responses[]
 }
@@ -39,6 +40,15 @@ model responses {
   questionid Int
   colleges   colleges  @relation(fields: [collegeid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "questionresponses_collegeid_fkey")
   questions  questions @relation(fields: [questionid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Suggestions {
+  id             BigInt   @id @default(autoincrement())
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  content        Json     @db.Json
+  college_domain String
+  colleges       colleges @relation(fields: [college_domain], references: [domain], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum question_category {

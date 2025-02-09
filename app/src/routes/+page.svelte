@@ -1,11 +1,6 @@
 <script lang="ts">
-	import type { School } from '$lib';
 	import type { PageData } from './$types';
-	import SearchBar from '$lib/icons/SearchBar.svelte';
-	import schools from '$lib/college_data.json';
-	import states from '$lib/statecodes.json';
-	import { isEqual } from 'lodash-es';
-	import type { colleges as College } from '@prisma/client';
+	import SearchBar from '$lib/components/SearchBar.svelte';
 
 	interface Props {
 		data: PageData;

@@ -21,7 +21,7 @@
 </script>
 
 <main
-	style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('/generic_campus/0.webp');">
+	style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('http://127.0.0.1:54321/storage/v1/object/public/campuses/generic1.webp');">
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">
@@ -32,22 +32,19 @@
 				<a href="/college/{domain}/edit" target="_blank">Suggest edit</a>
 			</div>
 
-			<!--{#snippet Response(responseText)}-->
-			<!--	-->
-			<!--{/snippet}-->
-
 			{#each Object.entries(college.responses) as [category, responses]}
-				<!--{#if question_categories[category]}-->
 				<h3>{question_categories[category]}</h3>
 				<ul>
 					{#each responses as { questions: { question: questionText }, response: responseText }}
-						<li>
-							<span class="question">{questionText}</span>:
-							{@html linkify(responseText)}
-						</li>
+						{#if questionText !== "Gives aid?"}
+							<!--TODO: Make a plan for this (gives aid)-->
+							<li>
+								<span class="question">{questionText}</span>:
+								{@html linkify(responseText)}
+							</li>
+						{/if}
 					{/each}
 				</ul>
-				<!--{/if}-->
 			{/each}
 		</div>
 
@@ -68,17 +65,28 @@
   main {
     margin: auto;
     max-width: 60rem;
-    //border: solid 1px black;
     background-size: 100% auto;
     background-repeat: repeat-y;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 
-    //  background-position: bottom;
-    //  height: 30vh;
-    //  width: 100%;
-    //background: url({gey}) no-repeat center center fixed;
+    opacity: 0;
+    visibility: hidden;
+    animation: fadeIn .7s ease forwards;  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      visibility: hidden;
+    }
+		75%{
+			opacity: 0;
+		}
+    100% {
+      opacity: 1;
+      visibility: visible;
+    }
   }
 
   .main-container {
@@ -101,6 +109,19 @@
     background-color: #FBF5F2;
   }
 
-  //.subheading
+  .subheading {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+
+    :last-child {
+      margin-left: auto;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
 
 </style>
