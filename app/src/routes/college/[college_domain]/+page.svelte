@@ -20,61 +20,42 @@
 
 </script>
 
-<div class="page-wrapper">
-	<main
-		style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('/generic_campus/0.webp');">
-		<!--	<img src={} alt={`Campus of ${college.name}`}>-->
-		<div class="main-container">
-			<div class="content">
-				<h1>{college.name}</h1>
+<main
+	style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('/generic_campus/0.webp');">
+	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
+	<div class="main-container">
+		<div class="content">
+			<h1>{college.name}</h1>
+			<div class="subheading">
 				<p>{college?.city}, {college.state}</p>
 				<a href="https://{domain}.edu">https://{domain}.edu</a>
 				<a href="/college/{domain}/edit" target="_blank">Suggest edit</a>
-
-				<!--{#snippet Response(responseText)}-->
-				<!--	-->
-				<!--{/snippet}-->
-
-				{#each Object.entries(college.responses) as [category, responses]}
-					<!--{#if question_categories[category]}-->
-					<h3>{question_categories[category]}</h3>
-					<ul>
-						{#each responses as { questions: { question: questionText }, response: responseText }}
-							<li>
-								<span class="question">{questionText}</span>:
-								{@html linkify(responseText)}
-							</li>
-						{/each}
-					</ul>
-					<!--{/if}-->
-				{/each}
 			</div>
 
+			<!--{#snippet Response(responseText)}-->
+			<!--	-->
+			<!--{/snippet}-->
+
+			{#each Object.entries(college.responses) as [category, responses]}
+				<!--{#if question_categories[category]}-->
+				<h3>{question_categories[category]}</h3>
+				<ul>
+					{#each responses as { questions: { question: questionText }, response: responseText }}
+						<li>
+							<span class="question">{questionText}</span>:
+							{@html linkify(responseText)}
+						</li>
+					{/each}
+				</ul>
+				<!--{/if}-->
+			{/each}
 		</div>
 
-	</main>
+	</div>
 
-</div>
+</main>
 
 <style lang="scss">
-
-  .page-wrapper {
-    //background-color: darken(#FBF5F2, 1%);
-    //background-color: darken(#FBF5F2, 90%);
-    //border: solid 1px black;
-    margin: 0 1rem 1rem;
-    background-color: #FBF5F2;
-    word-break: break-word;
-    //background-color: black;
-
-    font-family: "Roboto", serif;
-    font-optical-sizing: auto;
-    //font-weight: < weight>;
-    font-style: normal;
-    line-height: 1.5rem;
-    font-variation-settings: "wdth" 100;
-    color: #272838
-  }
 
   .question {
     font-weight: 500;
@@ -119,4 +100,7 @@
     display: inline-block;
     background-color: #FBF5F2;
   }
+
+  //.subheading
+
 </style>
