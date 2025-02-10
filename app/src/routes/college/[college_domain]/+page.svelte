@@ -7,6 +7,8 @@
 		data: PageData;
 	}
 
+	import { page } from '$app/state';
+
 	let { data }: Props = $props();
 
 	const { college, domain } = data;
@@ -18,10 +20,11 @@
 		);
 	}
 
+	const files_root = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
 </script>
 
 <main
-	style="background-image: url('http://127.0.0.1:54321/storage/v1/object/public/campuses/{domain}/0'), url('http://127.0.0.1:54321/storage/v1/object/public/campuses/generic');">
+	style="background-image: url('{files_root}/storage/v1/object/public/campuses/{domain}/0'), url('{files_root}/storage/v1/object/public/campuses/generic');">
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">
