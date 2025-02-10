@@ -30,7 +30,9 @@
 		<div class="content">
 			<h1>{college.name}</h1>
 			<div class="subheading">
-				<p>{college?.city}, {college.state}</p>
+				{#if college?.city && college?.state}
+					<p>{college?.city}, {college.state}</p>
+				{/if}
 				<a href="https://{domain}.edu">https://{domain}.edu</a>
 				<a href="/college/{domain}/edit" target="_blank">Suggest edit</a>
 			</div>
