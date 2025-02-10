@@ -24,7 +24,7 @@
 </script>
 
 <main
-	style="background-image: url('{files_root}/storage/v1/object/public/campuses/{domain}/0'), url('{files_root}/storage/v1/object/public/campuses/generic');">
+	style="background-image: url('{files_root}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{files_root}/storage/v1/object/public/campuses/generic');">
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">
