@@ -32,11 +32,11 @@ def download_all_campus_images(
 
 def create_supabase_client(
     key: str = None,
+    url: str = "http://127.0.0.1:54321",
     # TODO: move this to a .env file
 ) -> Client:
     if key is None:
         key: str = os.getenv("SERVICE_ROLE_KEY")
-    url: str = "http://127.0.0.1:54321"
 
     supabase: Client = create_client(url, key)
 
@@ -52,10 +52,14 @@ def upload_all_campus_images(
     if path_to_images[-1] != "/":
         path_to_images += "/"
 
-    for uni in os.listdir(path_to_images):
+    list_of_unis = os.listdir(path_to_images)
+    if "generic" in list_of_unis:
+        list_of_unis.remove("generic")
+    for uni in list_of_unis:
         for image in os.listdir(f"{path_to_images}{uni}"):
             with open(f"{path_to_images}{uni}/{image}", "rb") as f:
                 name = image.split(".")[0]
+                print(f"{path_to_images}{uni}/{image}")
                 supabase.storage.from_("campuses").upload(
                     f"{uni}/{name}",
                     f,
