@@ -43,7 +43,7 @@
 					{#each responses as { questions: { question: questionText }, response: responseText }}
 						{#if questionText !== "Gives aid?"}
 							<!--TODO: Make a plan for this (gives aid)-->
-							<li>
+							<li class="response">
 								<span class="question">{questionText}</span>:
 								{@html linkify(responseText)}
 							</li>
@@ -83,6 +83,10 @@
     opacity: 0;
     visibility: hidden;
     animation: fadeIn .7s ease forwards;
+
+    .response {
+      white-space: pre-wrap;
+    }
   }
 
   @keyframes fadeIn {
