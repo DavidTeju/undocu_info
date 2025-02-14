@@ -67,6 +67,5 @@ export const actions = {
 
 		redirect(303, "/thanks");
 
-		return { success: true };
 	}
 };

@@ -15,7 +15,7 @@ const config = {
 
 		csp: {
 			directives: {
-				'script-src': ['self']
+				'script-src': ['self', 'unsafe-hashes', 'sha256-7dQwUgLau1NFCCGjfn9FsYptB6ZtWxJin6VohGIu20I=']
 			},
 			// must be specified with either the `report-uri` or `report-to` directives, or both
 			reportOnly: {

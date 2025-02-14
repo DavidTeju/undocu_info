@@ -2,29 +2,30 @@
 	import question_categories from '$lib/question_categories.json';
 	import type { PageData } from './$types';
 	import { validEmailRegex, validUrlRegex } from '$lib/utils';
+	import { page } from '$app/state';
 
 	interface Props {
 		data: PageData;
 	}
-
-	import { page } from '$app/state';
 
 	let { data }: Props = $props();
 
 	const { college, domain } = data;
 
 	function linkify(text: string) {
-		const validLink = new RegExp('(' + validEmailRegex.source + ')|(' + validUrlRegex.source + ')', 'g');
-		return text.replace(validLink, (url) =>
+		return text.replaceAll(/[”']/g, '"').replace(validUrlRegex, (url) =>
 			`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+		).replace(validEmailRegex, (email) =>
+			`<a href="mailto:${email}" target="_blank" rel="noopener noreferrer">${email}</a>`
 		);
 	}
 
-	const files_root = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
+	const FILES_ROOT = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
+
 </script>
 
 <main
-	style="background-image: url('{files_root}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{files_root}/storage/v1/object/public/campuses/generic');">
+	style="background-image: url('{FILES_ROOT}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{FILES_ROOT}/storage/v1/object/public/campuses/generic');">
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">

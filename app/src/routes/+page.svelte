@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import SearchBar from '$lib/components/SearchBar.svelte';
+	import Card from '$lib/components/Card.svelte';
 
 	interface Props {
 		data: PageData;
@@ -29,26 +30,30 @@
 		Every Student Deserves an Education :)</p>
 
 
-	<SearchBar bind:value={searchText} />
-	{#if collegesByStateFiltered.length === 0}
-		<p>No Colleges Match Your Search... :(</p>
-		<!--		TODO: Add a button/link for students to suggest universities-->
-	{:else }
-		{@const numColleges = collegesByStateFiltered.flatMap(({ colleges }) => colleges).length}
-		<p class="num-colleges"> {numColleges} College{numColleges > 1 ? "s" : ""} Found!
-		</p>
-	{/if}
-
-	{#each collegesByStateFiltered as { state, colleges }}
-		<h2>{state}</h2>
-		{#each colleges as { domain, name }}
-			<p>
-				<a href={`/college/${domain}`}>
-					{name}
-				</a>
+	<div class="college-list">
+		<SearchBar bind:value={searchText} />
+		{#if collegesByStateFiltered.length === 0}
+			<p>No Colleges Match Your Search... :(</p>
+			<!--		TODO: Add a button/link for students to suggest universities-->
+		{:else }
+			{@const numColleges = collegesByStateFiltered.flatMap(({ colleges }) => colleges).length}
+			<p class="num-colleges"> {numColleges} College{numColleges > 1 ? "s" : ""} Found!
 			</p>
+		{/if}
+
+		{#each collegesByStateFiltered as { state, colleges }}
+			<h2>{state}</h2>
+			<div class="state-list">
+				{#each colleges as college(college.id)}
+					<Card {college}></Card>
+				{/each}
+			</div>
 		{/each}
-	{/each}
+	</div>
+
+	<p>For more state-by-state policies for public colleges, I recommend checking out: <a
+		href="https://www.higheredimmigrationportal.org/">higheredimmigrationportal.org</a></p>
+<!--	<p>Don't see a school you like? Help build this resource by <a href="">Requesting a School</a></p>-->
 
 
 </main>
@@ -65,6 +70,10 @@
       margin-top: -.5rem;
       margin-left: .5rem;
     }
+
+    .college-list {
+      padding: 0 clamp(0rem, 5vw, 4rem);
+    }
   }
 
   .saying {
@@ -73,5 +82,11 @@
     margin-bottom: 2rem;
     font-size: .75rem;
     font-style: italic;
+  }
+
+  .state-list {
+    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   }
 </style>
