@@ -4,7 +4,7 @@
 	let { college } = $props();
 	const { domain, name }: { domain: string, name: string } = college;
 	const FILES_ROOT = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
-	let src = $state(`${FILES_ROOT}/storage/v1/render/image/public/campuses/${domain}/0?width=1000&height=750`);
+	let src = $state(`${FILES_ROOT}/storage/v1/render/image/public/campuses/${domain}/0?width=400&height=400`);
 
 	function handleError(event) {
 		event.target.src = '/generic.webp';
