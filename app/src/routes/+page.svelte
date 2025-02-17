@@ -34,7 +34,6 @@
 		<SearchBar bind:value={searchText} />
 		{#if collegesByStateFiltered.length === 0}
 			<p>No Colleges Match Your Search... :(</p>
-			<!--		TODO: Add a button/link for students to suggest universities-->
 		{:else }
 			{@const numColleges = collegesByStateFiltered.flatMap(({ colleges }) => colleges).length}
 			<p class="num-colleges"> {numColleges} College{numColleges > 1 ? "s" : ""} Found!
@@ -45,7 +44,9 @@
 			<h2>{state}</h2>
 			<div class="state-list">
 				{#each colleges as college(college.id)}
-					<Card {college}></Card>
+					{#if !college.hidden}
+						<Card {college}></Card>
+					{/if}
 				{/each}
 			</div>
 		{/each}
@@ -53,9 +54,8 @@
 
 	<p>For more state-by-state policies for public colleges, I recommend checking out: <a
 		href="https://www.higheredimmigrationportal.org/">higheredimmigrationportal.org</a></p>
-<!--	<p>Don't see a school you like? Help build this resource by <a href="">Requesting a School</a></p>-->
-
-
+	<!--	<p>Don't see a school you like? Help build this resource by <a href="">Requesting a School</a></p>-->
+	<!--		TODO: Add a button/link for students to suggest universities-->
 </main>
 
 <style lang="scss">

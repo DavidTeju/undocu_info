@@ -13,6 +13,7 @@ model colleges {
   domain         String           @unique
   city           String?
   state          String?
+  hidden         Boolean?         @default(false)
   Suggestions    Suggestions[]
   emailaddresses emailaddresses[]
   responses      responses[]
