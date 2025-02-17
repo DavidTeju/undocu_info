@@ -44,9 +44,7 @@
 			<h2>{state}</h2>
 			<div class="state-list">
 				{#each colleges as college(college.id)}
-					{#if !college.hidden}
-						<Card {college}></Card>
-					{/if}
+					<Card {college}></Card>
 				{/each}
 			</div>
 		{/each}

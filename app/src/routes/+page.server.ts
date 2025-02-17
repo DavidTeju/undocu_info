@@ -9,6 +9,7 @@ export const load: PageServerLoad = async () => {
 
 	const colleges = await prisma.colleges.findMany({
 		where: {
+			hidden: false,
 			responses: {
 				some: {}
 			}
