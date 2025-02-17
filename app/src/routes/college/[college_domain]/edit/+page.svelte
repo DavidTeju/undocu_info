@@ -1,11 +1,12 @@
 <script lang="ts">
 	import question_categories from '$lib/question_categories.json';
+	import Error from '$lib/components/Error.svelte';
 	// import type { Session } from '@supabase/supabase-js';
 	// import { supabase } from '$lib/supabaseClient';
 	// import { validEmailRegex } from '$lib/utils';
 
 
-	let { data } = $props();
+	let { data, form } = $props();
 	const { questionsCategorized, collegeName } = data;
 
 	// let email = $state('');
@@ -63,6 +64,9 @@
 	<!--{:else}-->
 	<!--	<p>Verified!</p>-->
 	<!--{/if}-->
+	{#if !form?.success && form?.reason === 'No changes detected'}
+		<Error message="No Changes Detected!" />
+	{/if}
 
 	<form method="post">
 		{#each Object.entries(question_categories) as [category, categoryText]}

@@ -1,4 +1,4 @@
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
 import { redirect } from '@sveltejs/kit';
 
@@ -41,22 +41,49 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions = {
 	default: async ({ params, request }) => {
-		const data = await request.formData();
+		const formData = await request.formData();
 
-		const suggestionsAsArray = await prisma.questions.findMany(
+		const questionsWithOldResponses = await prisma.questions.findMany(
 			{
 				select: {
 					id: true,
-					question: true
+					question: true,
+					responses: {
+						where: {
+							colleges: {
+								domain: params.college_domain
+							}
+						},
+						select: {
+							response: true
+						}
+					}
 				}
-			}).then(questions =>
-			questions.map(q => ({
+			});
+
+		const questionswithSuggestions = questionsWithOldResponses
+			.map(q => ({
 				id: q.id,
 				question: q.question,
-				response: data.get(q.id.toString())
-			})).filter(q => q.response !== null));
+				oldResponse: q.responses[0]?.response || null,
+				response: formData.get(q.id.toString()) || null
+			}))
+			.filter(({ response, oldResponse }) => response !== null && response !== oldResponse)
+			.map(
+				({ id, question, response }) => ({ id, question, response })
+			);
 
-		const suggestionsAsObject = Object.fromEntries(suggestionsAsArray.map(q => [q.id, q]));
+		console.log(questionsWithOldResponses.map(q => ({
+			id: q.id,
+			question: q.question,
+			oldResponse: q.responses[0]?.response || null,
+			response: formData.get(q.id.toString()) || null
+		})));
+		if (questionswithSuggestions.length === 0) {
+			return { success: false, reason: 'No changes detected' };
+		}
+
+		const suggestionsAsObject = Object.fromEntries(questionswithSuggestions.map(q => [q.id, q]));
 
 		await prisma.suggestions.create({
 			data: {
@@ -65,7 +92,6 @@ export const actions = {
 			}
 		});
 
-		redirect(303, "/thanks");
-
+		redirect(303, '/thanks');
 	}
-};
+} satisfies Actions;
