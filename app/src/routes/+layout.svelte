@@ -26,17 +26,11 @@
   }
 
   .page-wrapper {
-    //background-color: darken(#FBF5F2, 1%);
-    //background-color: darken(#FBF5F2, 90%);
-    //border: solid 1px black;
     border-radius: 1rem;
     background-color: #FBF5F2;
     word-break: break-word;
-    //background-color: black;
-
     font-family: "Roboto", serif;
     font-optical-sizing: auto;
-    //font-weight: < weight>;
     font-style: normal;
     line-height: 1.5;
     font-variation-settings: "wdth" 100;
@@ -83,7 +77,6 @@
     font-style: normal;
     font-size: 1.75rem;
     font-weight: 700;
-    //padding: 1.25rem 2rem .5rem;
     background-color: inherit;
 
     a {
@@ -109,7 +102,6 @@
       border-bottom: 0;
     }
 
-    //color: #272838;
     color: #0000EE
   }
 

@@ -12,7 +12,7 @@
 </script>
 
 <a href={`/college/${domain}`} class="parent">
-	<img class="first" alt=""
+	<img class="first" alt="Image of ${name} campus"
 			 onerror={handleError}
 			 {src} />
 	<div class="last">
@@ -27,7 +27,6 @@
     display: inline-flex;
     flex-direction: column;
     width: 20rem;
-    //height: 20rem;
     aspect-ratio: 1 / 1;
     border-radius: 1rem;
     overflow: hidden;
@@ -65,19 +64,19 @@
     .parent {
       height: 4rem;
       flex-direction: row;
-			aspect-ratio: unset;
-			width: 70%;
+      aspect-ratio: unset;
+      width: 70%;
 
       img {
         height: 100%;
         aspect-ratio: 1 / 1;
-				flex-grow: unset;
+        flex-grow: unset;
       }
 
-			.last {
-				height: 100%;
-				font-size: 0.8rem;
-			}
+      .last {
+        height: 100%;
+        font-size: 0.8rem;
+      }
     }
   }
 </style>
