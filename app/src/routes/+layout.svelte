@@ -15,11 +15,11 @@
 </div>
 
 <style lang="scss">
+  @use "sass:color";
   @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
   .background {
-    /*background-color: #CACFD6;*/
-    background-color: darken(#FBF5F2, 5%);
+    background-color: color.adjust(#FBF5F2, $lightness: -5%);
     border: solid 1px #00000000;
     padding: 1rem;
     min-height: 100vh;
