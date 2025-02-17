@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/state';
 
-	let { college } = $props();
-	const { domain, name }: { domain: string, name: string } = college;
+	let { college }: { college: { domain: string, name: string } } = $props();
+	const { domain, name } = college;
 	const FILES_ROOT = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
 	let src = $state(`${FILES_ROOT}/storage/v1/render/image/public/campuses/${domain}/0?width=400&height=400`);
 
-	function handleError(event) {
-		event.target.src = '/generic.webp';
+	function handleError(event: Event) {
+		const target = event.target as HTMLImageElement | null;
+
+		if (target) {
+			target.src = '/generic.webp';
+		}
 	}
 </script>
 
