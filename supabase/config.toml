@@ -83,8 +83,8 @@ enabled = true
 file_size_limit = "50MiB"
 
 # Image transformation API is available to Supabase Pro plan.
-# [storage.image_transformation]
-# enabled = true
+[storage.image_transformation]
+enabled = true
 
 # Uncomment to configure local storage buckets
 # [storage.buckets.images]
@@ -147,9 +147,9 @@ otp_expiry = 3600
 # sender_name = "Admin"
 
 # Uncomment to customize email template
-[auth.email.template.invite]
-subject = "You have been invited"
-content_path = "./templates/invite.html"
+# [auth.email.template.invite]
+# subject = "You have been invited"
+# content_path = "./templates/invite.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

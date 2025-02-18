@@ -1,11 +1,7 @@
 <script lang="ts">
-	import type { School } from '$lib';
 	import type { PageData } from './$types';
-	import SearchBar from '$lib/icons/SearchBar.svelte';
-	import schools from '$lib/college_data.json';
-	import states from '$lib/statecodes.json';
-	import { isEqual } from 'lodash-es';
-	import type { colleges as College } from '@prisma/client';
+	import SearchBar from '$lib/components/SearchBar.svelte';
+	import Card from '$lib/components/Card.svelte';
 
 	interface Props {
 		data: PageData;
@@ -30,25 +26,34 @@
 
 <main>
 	<h1>College Advising Database for Undocumented Students</h1>
+	<p class="saying">Because
+		Every Student Deserves an Education :)</p>
 
 
-	<SearchBar bind:value={searchText} />
-	{#if collegesByStateFiltered.length === 0}
-		<p>No Colleges Match Your Search... :(</p>
-		<!--		TODO: Add a button/link for students to suggest universities-->
-	{/if}
-	{#each collegesByStateFiltered as { state, colleges }}
-		<h2>{state}</h2>
-		{#each colleges as { domain, name }}
-			<p>
-				<a href={`/college/${domain}`}>
-					{name}
-				</a>
+	<div class="college-list">
+		<SearchBar bind:value={searchText} />
+		{#if collegesByStateFiltered.length === 0}
+			<p>No Colleges Match Your Search... :(</p>
+		{:else }
+			{@const numColleges = collegesByStateFiltered.flatMap(({ colleges }) => colleges).length}
+			<p class="num-colleges"> {numColleges} College{numColleges > 1 ? "s" : ""} Found!
 			</p>
+		{/if}
+
+		{#each collegesByStateFiltered as { state, colleges }}
+			<h2>{state}</h2>
+			<div class="state-list">
+				{#each colleges as college(college.id)}
+					<Card {college}></Card>
+				{/each}
+			</div>
 		{/each}
-	{/each}
+	</div>
 
-
+	<p>For more state-by-state policies for public colleges, I recommend checking out: <a
+		href="https://www.higheredimmigrationportal.org/">higheredimmigrationportal.org</a></p>
+	<!--	<p>Don't see a school you like? Help build this resource by <a href="">Requesting a School</a></p>-->
+	<!--		TODO: Add a button/link for students to suggest universities-->
 </main>
 
 <style lang="scss">
@@ -56,24 +61,30 @@
 
   main {
     padding: 1rem clamp(1rem, 10vw, 4rem);
+
+    .num-colleges {
+      font-size: .75rem;
+      font-style: italic;
+      margin-top: -.5rem;
+      margin-left: .5rem;
+    }
+
+    .college-list {
+      padding: 0 clamp(0rem, 5vw, 4rem);
+    }
+  }
+
+  .saying {
+    margin-top: -1rem;
+    margin-left: .25rem;
+    margin-bottom: 2rem;
+    font-size: .75rem;
+    font-style: italic;
+  }
+
+  .state-list {
+    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   }
 </style>
-
-<!--{#each toShow.slice(0, 10) as { domain, name }}-->
-<!--	<a href={`/college/${domain}`}>-->
-<!--		<h3>{name}</h3>-->
-<!--	</a>-->
-<!--{/each}-->
-
-
-<!--<input bind:value={queryParams.searchText} name="searchText" type="text">-->
-<!--<label for="giveAid">Only show colleges that give aid</label>-->
-<!--<input bind:checked={queryParams.giveAid} type="checkbox" id="giveAid" name="giveAid">-->
-<!--<label for="state">State</label>-->
-<!--<select bind:value={queryParams.state} name="state" id="state">-->
-<!--	<option value="all">All</option>-->
-<!--	{#each states as { name, code }}-->
-<!--		<option value={code}>{name}</option>-->
-<!--	{/each}-->
-<!--</select>-->
-<!--<h2>Colleges</h2>-->

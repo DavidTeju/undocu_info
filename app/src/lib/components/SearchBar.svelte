@@ -1,5 +1,5 @@
-<script>
-	let { value = $bindable() } = $props();
+<script lang="ts">
+	let { value = $bindable() }: {value: string}= $props();
 
 </script>
 <div>

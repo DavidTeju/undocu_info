@@ -1,0 +1,401 @@
+[
+    {
+        "domain": "ben",
+        "url": "https://ben.edu",
+        "names": [
+            "Benedictine University Az",
+            "Benedictine University Il"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "berklee",
+        "url": "https://berklee.edu",
+        "names": [
+            "Berklee College Of Music",
+            "The Boston Conservatory"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "cca",
+        "url": "https://cca.edu",
+        "names": [
+            "California College Arts",
+            "California College Of The Arts"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "mountsaintvincent",
+        "url": "https://mountsaintvincent.edu",
+        "names": [
+            "College Of Mount Saint Vincent",
+            "College of Mount Saint Vincent"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "strose",
+        "url": "https://strose.edu",
+        "names": [
+            "College of Saint Rose",
+            "The College Of St Rose"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "columbiacollege",
+        "url": "https://columbiacollege.edu",
+        "names": [
+            "Columbia College Hollywood",
+            "Flashpoint Chicago Campus Columbia College Hollywood"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "erau",
+        "url": "https://erau.edu",
+        "names": [
+            "Embry Riddle Aeronautical University Daytona Beach",
+            "Embry Riddle Aeronautical University Prescott",
+            "Embry Riddle Aeronautical University Worldwide Campus"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "emmanuel",
+        "url": "https://emmanuel.edu",
+        "names": [
+            "Emmanuel College",
+            "Emmanuel College Ma"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "newschool",
+        "url": "https://newschool.edu",
+        "names": [
+            "Eugene Lang College The New School For Liberal Arts",
+            "New School",
+            "Parsons The New School For Design",
+            "The New School College Of Performing Arts"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "fau",
+        "url": "https://fau.edu",
+        "names": [
+            "Florida Atlantic University",
+            "Wilkes Honors College"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "inter",
+        "url": "https://inter.edu",
+        "names": [
+            "Inter American University Of Puerto Rico Aguadilla",
+            "Inter American University Of Puerto Rico Fajardo",
+            "Inter American University Of Puerto Rico Guayama",
+            "Inter American University Of Puerto Rico Ponce"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "johnsonu",
+        "url": "https://johnsonu.edu",
+        "names": [
+            "Johnson University",
+            "Johnson University Florida"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "liu",
+        "url": "https://liu.edu",
+        "names": [
+            "Long Island University Brooklyn Campus",
+            "Long Island University Post Campus"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "newhaven",
+        "url": "https://newhaven.edu",
+        "names": [
+            "Lyme Academy College Of Fine Arts",
+            "University Of New Haven"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "mu",
+        "url": "https://mu.edu",
+        "names": [
+            "Marquette University",
+            "Maynooth University Ireland"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "ul",
+        "url": "https://ul.edu",
+        "names": [
+            "Mary Immaculate College",
+            "University Of Limerick"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "northwestern",
+        "url": "https://northwestern.edu",
+        "names": [
+            "Northwestern University",
+            "Northwestern University Qatar"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "northwood",
+        "url": "https://northwood.edu",
+        "names": [
+            "Northwood University",
+            "Northwood University Michigan Campus"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "psu",
+        "url": "https://psu.edu",
+        "names": [
+            "Penn State",
+            "Pennsylvania State Erie The Behrend College"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "rutgers",
+        "url": "https://rutgers.edu",
+        "names": [
+            "Rutgers The State University Of New Jersey Camden",
+            "Rutgers The State University Of New Jersey New Brunswick",
+            "Rutgers The State University Of New Jersey Newark"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "sage",
+        "url": "https://sage.edu",
+        "names": [
+            "Sage Colleges",
+            "The Sage Colleges"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "sagu",
+        "url": "https://sagu.edu",
+        "names": [
+            "Sagu American Indian College",
+            "Southwestern Assemblies Of God University"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "slu",
+        "url": "https://slu.edu",
+        "names": [
+            "Saint Louis University",
+            "Saint Louis University Madrid Campus Spain"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "tufts",
+        "url": "https://tufts.edu",
+        "names": [
+            "School Of The Museum Of Fine Arts Boston",
+            "Tufts University"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "sjc",
+        "url": "https://sjc.edu",
+        "names": [
+            "St Johns College",
+            "St Johns College Md"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "sjcny",
+        "url": "https://sjcny.edu",
+        "names": [
+            "St Josephs College Brooklyn",
+            "St Josephs College Brooklyn Campus",
+            "St Josephs College Long Island Campus",
+            "St Josephs College New York Long Island"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "temple",
+        "url": "https://temple.edu",
+        "names": [
+            "Temple University",
+            "Temple University Japan Campus"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "tusculum",
+        "url": "https://tusculum.edu",
+        "names": [
+            "Tusculum College",
+            "Tusculum University"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "suagm",
+        "url": "https://suagm.edu",
+        "names": [
+            "Universidad Del Este Une",
+            "Universidad Del Turabo"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "uc",
+        "url": "https://uc.edu",
+        "names": [
+            "University Of Cincinnati",
+            "University Of Cincinnati Clermont College"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "hawaii",
+        "url": "https://hawaii.edu",
+        "names": [
+            "University Of Hawaii At Hilo",
+            "University Of Hawaii At Manoa",
+            "University Of Hawaii West Oahu"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "uic",
+        "url": "https://uic.edu",
+        "names": [
+            "University Of Illinois At Chicago",
+            "University Of Illinois Chicago"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "maine",
+        "url": "https://maine.edu",
+        "names": [
+            "University Of Maine",
+            "University Of Maine At Augusta",
+            "University Of Maine Augusta",
+            "University Of Maine Farmington",
+            "University Of Maine Fort Kent",
+            "University Of Maine Machias",
+            "University Of Maine Presque Isle",
+            "University Of Southern Maine"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "umn",
+        "url": "https://umn.edu",
+        "names": [
+            "University Of Minnesota At Crookston",
+            "University Of Minnesota Duluth",
+            "University Of Minnesota Morris",
+            "University Of Minnesota Rochester",
+            "University Of Minnesota Twin Cities"
+        ],
+        "keep": 5
+    },
+    {
+        "domain": "missouri",
+        "url": "https://missouri.edu",
+        "names": [
+            "University Of Missouri",
+            "University Of Missouri Columbia"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "pacific",
+        "url": "https://pacific.edu",
+        "names": [
+            "University Of Pacific",
+            "University Of The Pacific"
+        ],
+        "keep": 2
+    },
+    {
+        "domain": "pitt",
+        "url": "https://pitt.edu",
+        "names": [
+            "University Of Pittsburgh",
+            "University Of Pittsburgh At Bradford",
+            "University Of Pittsburgh At Greensburg",
+            "University Of Pittsburgh At Johnstown"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "upr",
+        "url": "https://upr.edu",
+        "names": [
+            "University Of Puerto Rico Arecibo",
+            "University Of Puerto Rico Bayamon",
+            "University Of Puerto Rico Ponce"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "usf",
+        "url": "https://usf.edu",
+        "names": [
+            "University Of South Florida",
+            "University Of South Florida Sarasota Manatee"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "uw",
+        "url": "https://uw.edu",
+        "names": [
+            "University Of Washington Bothell",
+            "University Of Washington Tacoma"
+        ],
+        "keep": -1
+    },
+    {
+        "domain": "wvu",
+        "url": "https://wvu.edu",
+        "names": [
+            "West Virginia University",
+            "West Virginia University Institute Of Technology"
+        ],
+        "keep": 1
+    },
+    {
+        "domain": "wright",
+        "url": "https://wright.edu",
+        "names": [
+            "Wright State University",
+            "Wright State University Lake Campus"
+        ],
+        "keep": 1
+    }
+]
