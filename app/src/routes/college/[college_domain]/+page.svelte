@@ -2,7 +2,7 @@
 	import question_categories from '$lib/question_categories.json';
 	import type { PageData } from './$types';
 	import { validEmailRegex, validUrlRegex } from '$lib/utils';
-	import { page } from '$app/state';
+	import { PUBLIC_FILES_ROOT } from '$env/static/public';
 
 	interface Props {
 		data: PageData;
@@ -13,19 +13,40 @@
 	const { college, domain } = data;
 
 	function linkify(text: string) {
-		return text.replaceAll(/[”']/g, '"').replace(validUrlRegex, (url) =>
-			`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
-		).replace(validEmailRegex, (email) =>
-			`<a href="mailto:${email}" target="_blank" rel="noopener noreferrer">${email}</a>`
-		);
+		const escapeHtml = (str: string) =>
+			str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+		// Store URLs/emails and replace with placeholders before escaping
+		const links: Array<{ type: 'url' | 'email'; value: string }> = [];
+		let processed = text
+			.replaceAll(/["']/g, '"')
+			.replace(validUrlRegex, (url) => {
+				links.push({ type: 'url', value: url });
+				return `\x00LINK${links.length - 1}\x00`;
+			})
+			.replace(validEmailRegex, (email) => {
+				links.push({ type: 'email', value: email });
+				return `\x00LINK${links.length - 1}\x00`;
+			});
+
+		// Escape HTML in the text (placeholders are safe)
+		processed = escapeHtml(processed);
+
+		// Replace placeholders with anchor tags
+		return processed.replace(/\x00LINK(\d+)\x00/g, (_, i) => {
+			const { type, value } = links[parseInt(i)];
+			const escaped = escapeHtml(value);
+			return type === 'url'
+				? `<a href="${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`
+				: `<a href="mailto:${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`;
+		});
 	}
 
-	const FILES_ROOT = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
 
 </script>
 
 <main
-	style="background-image: url('{FILES_ROOT}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{FILES_ROOT}/storage/v1/object/public/campuses/generic');">
+	style="background-image: url('{PUBLIC_FILES_ROOT}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{PUBLIC_FILES_ROOT}/storage/v1/object/public/campuses/generic');">
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">

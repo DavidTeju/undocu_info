@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { PUBLIC_FILES_ROOT } from '$env/static/public';
 
 	let { college }: { college: { domain: string, name: string } } = $props();
 	const { domain, name } = college;
-	const FILES_ROOT = page.url.host.includes('undocustudent.org') ? 'https://files.undocustudent.org' : 'http://127.0.0.1:54321';
-	let src = $state(`${FILES_ROOT}/storage/v1/render/image/public/campuses/${domain}/0?width=400&height=400`);
+	let src = $state(`${PUBLIC_FILES_ROOT}/storage/v1/render/image/public/campuses/${domain}/0?width=400&height=400`);
 
 	function handleError(event: Event) {
 		const target = event.target as HTMLImageElement | null;
