@@ -1,11 +1,11 @@
-FROM node:latest
-LABEL authors="davidtejuosho"
+FROM node:24-slim
+LABEL authors="David Tejuosho"
 WORKDIR /usr/local/app
 
-
+COPY package*.json ./
+RUN npm install        
 COPY . .
 ENV PORT=4173
-RUN npm install
 RUN npx prisma generate
 RUN npm run build
 
