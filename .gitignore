@@ -2,3 +2,8 @@
 **/.idea
 **/node_modules
 **/.venv/
+
+# Env
+.env
+.env.*
+!.env.example
