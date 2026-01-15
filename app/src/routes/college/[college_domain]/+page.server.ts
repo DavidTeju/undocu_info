@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
+import { error } from '@sveltejs/kit';
 import type { question_category } from '@prisma/client';
 
 
@@ -18,7 +19,7 @@ const getResponsesForCollege_Categorized = async (college_domain: string) => {
 	});
 
 	if (!college) {
-		throw new Error('Kaboom!');
+		error(404, 'College not found');
 	}
 
 	return {
