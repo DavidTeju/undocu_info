@@ -1,6 +1,8 @@
 import type { Actions, PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
+
+const MAX_RESPONSE_LENGTH = 5000;
 
 export const load: PageServerLoad = async ({ params }) => {
 	const questions = await prisma.questions.findMany({
@@ -62,25 +64,30 @@ export const actions = {
 			});
 
 		const questionswithSuggestions = questionsWithOldResponses
-			.map(q => ({
-				id: q.id,
-				question: q.question,
-				oldResponse: q.responses[0]?.response || null,
-				response: formData.get(q.id.toString()) || null
-			}))
-			.filter(({ response, oldResponse }) => response !== null && response !== oldResponse)
-			.map(
-				({ id, question, response }) => ({ id, question, response })
-			);
+			.map(q => {
+				const rawResponse = formData.get(q.id.toString());
+				const response = typeof rawResponse === 'string' ? rawResponse.trim() : null;
+				return {
+					id: q.id,
+					question: q.question,
+					oldResponse: q.responses[0]?.response || null,
+					response
+				};
+			})
+			.filter(({ response, oldResponse }) => response !== null && response !== oldResponse);
 
-		console.log(questionsWithOldResponses.map(q => ({
-			id: q.id,
-			question: q.question,
-			oldResponse: q.responses[0]?.response || null,
-			response: formData.get(q.id.toString()) || null
-		})));
-		if (questionswithSuggestions.length === 0) {
-			return { success: false, reason: 'No changes detected' };
+		// Validate response lengths
+		const tooLong = questionswithSuggestions.find(q => q.response && q.response.length > MAX_RESPONSE_LENGTH);
+		if (tooLong) {
+			return fail(400, { success: false, reason: `Response too long (max ${MAX_RESPONSE_LENGTH} characters)` });
+		}
+
+		const suggestions = questionswithSuggestions.map(
+			({ id, question, response }) => ({ id, question, response })
+		);
+
+		if (suggestions.length === 0) {
+			return fail(400, { success: false, reason: 'No changes detected' });
 		}
 
 		const suggestionsAsObject = Object.fromEntries(questionswithSuggestions.map(q => [q.id, q]));

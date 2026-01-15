@@ -5,9 +5,13 @@
 	// import { supabase } from '$lib/supabaseClient';
 	// import { validEmailRegex } from '$lib/utils';
 
+	const MAX_RESPONSE_LENGTH = 5000;
 
 	let { data, form } = $props();
 	const { questionsCategorized, collegeName } = data;
+
+	// Track character counts for each textarea
+	let charCounts: Record<string, number> = $state({});
 
 	// let email = $state('');
 	// let otp = $state('');
@@ -64,8 +68,8 @@
 	<!--{:else}-->
 	<!--	<p>Verified!</p>-->
 	<!--{/if}-->
-	{#if !form?.success && form?.reason === 'No changes detected'}
-		<Error message="No Changes Detected!" />
+	{#if !form?.success && form?.reason}
+		<Error message={form.reason} />
 	{/if}
 
 	<form method="post">
@@ -74,10 +78,22 @@
 				<legend>{categoryText}</legend>
 				{#if questionsCategorized[category]}
 					{#each questionsCategorized[category] as { id, question, response }}
-						<label for={id.toString()}>
+						{@const fieldId = id.toString()}
+						<label for={fieldId}>
 							{question}
 						</label>
-						<textarea name={id.toString()} id={id.toString()} placeholder="Nothing here...">{response}</textarea>
+						<div class="textarea-wrapper">
+							<textarea
+								name={fieldId}
+								id={fieldId}
+								placeholder="Nothing here..."
+								maxlength={MAX_RESPONSE_LENGTH}
+								oninput={(e) => charCounts[fieldId] = e.currentTarget.value.length}
+							>{response}</textarea>
+							<span class="char-count" class:near-limit={(charCounts[fieldId] ?? response?.length ?? 0) > MAX_RESPONSE_LENGTH * 0.9}>
+								{charCounts[fieldId] ?? response?.length ?? 0} / {MAX_RESPONSE_LENGTH}
+							</span>
+						</div>
 					{/each}
 				{/if}
 			</fieldset>
@@ -125,17 +141,35 @@
           margin-bottom: 0.5rem;
         }
 
+        .textarea-wrapper {
+          position: relative;
+          margin-bottom: 1rem;
+        }
+
         textarea {
           width: 100%;
           field-sizing: content;
           min-height: 5rem;
-          max-height: 12rem;;
+          max-height: 12rem;
           line-height: 1.5;
           padding: 0.5rem 1rem;
           scroll-padding: 0.5rem;
           resize: vertical;
           border-radius: .3rem;
           background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .char-count {
+          display: block;
+          text-align: right;
+          font-size: 0.75rem;
+          color: #666;
+          margin-top: 0.25rem;
+
+          &.near-limit {
+            color: #c00;
+            font-weight: 500;
+          }
         }
       }
     }
