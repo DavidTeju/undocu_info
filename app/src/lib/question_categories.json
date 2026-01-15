@@ -1,6 +1,6 @@
 {
-  "admission": "Admissions Information",
-  "financial": "Financial Aid & Scholarships",
-  "life": "Student Life",
-  "other": "Other Information"
+	"admission": "Admissions Information",
+	"financial": "Financial Aid & Scholarships",
+	"life": "Student Life",
+	"other": "Other Information"
 }

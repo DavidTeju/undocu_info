@@ -3,7 +3,6 @@ import prisma from '$lib/prisma';
 import { error } from '@sveltejs/kit';
 import type { question_category } from '@prisma/client';
 
-
 const getResponsesForCollege_Categorized = async (college_domain: string) => {
 	const college = await prisma.colleges.findUnique({
 		where: {
@@ -24,12 +23,15 @@ const getResponsesForCollege_Categorized = async (college_domain: string) => {
 
 	return {
 		...college,
-		responses: college.responses.reduce((acc, response) => {
-			const category = response.questions.category as question_category;
-			acc[category] = acc[category] || [];
-			acc[category].push(response);
-			return acc;
-		}, {} as Record<question_category, Array<typeof college.responses[0]>>)
+		responses: college.responses.reduce(
+			(acc, response) => {
+				const category = response.questions.category as question_category;
+				acc[category] = acc[category] || [];
+				acc[category].push(response);
+				return acc;
+			},
+			{} as Record<question_category, Array<(typeof college.responses)[0]>>
+		)
 	};
 };
 

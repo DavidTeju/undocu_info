@@ -14,7 +14,11 @@
 
 	function linkify(text: string) {
 		const escapeHtml = (str: string) =>
-			str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+			str
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;');
 
 		// Store URLs/emails and replace with placeholders before escaping
 		const links: Array<{ type: 'url' | 'email'; value: string }> = [];
@@ -41,12 +45,11 @@
 				: `<a href="mailto:${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`;
 		});
 	}
-
-
 </script>
 
 <main
-	style="background-image: url('{PUBLIC_FILES_ROOT}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{PUBLIC_FILES_ROOT}/storage/v1/object/public/campuses/generic');">
+	style="background-image: url('{PUBLIC_FILES_ROOT}/storage/v1/render/image/public/campuses/{domain}/0?width=1000&height=750'), url('{PUBLIC_FILES_ROOT}/storage/v1/object/public/campuses/generic');"
+>
 	<!--	<img src={} alt={`Campus of ${college.name}`}>-->
 	<div class="main-container">
 		<div class="content">
@@ -56,7 +59,7 @@
 					<p>{college?.city}, {college.state}</p>
 				{/if}
 				<a href="https://{domain}.edu">https://{domain}.edu</a>
-<!--				<a href="/college/{domain}/edit" target="_blank">Suggest edit</a>-->
+				<!--				<a href="/college/{domain}/edit" target="_blank">Suggest edit</a>-->
 			</div>
 
 			{#each Object.entries(college.responses) as [category, responses]}
@@ -65,7 +68,7 @@
 					{#each responses as resp}
 						{@const questionText = resp.questions.question}
 						{@const responseText = resp.response}
-						{#if questionText !== "Gives aid?"}
+						{#if questionText !== 'Gives aid?'}
 							<!--TODO: Make a plan for this (gives aid)-->
 							<li class="response">
 								<span class="question">{questionText}</span>:
@@ -76,90 +79,86 @@
 				</ul>
 			{/each}
 		</div>
-
 	</div>
-
 </main>
 
 <style lang="scss">
+	.question {
+		font-weight: 500;
+	}
 
-  .question {
-    font-weight: 500;
-  }
+	li {
+		margin-bottom: 0.5rem;
 
-  li {
-    margin-bottom: .5rem;
+		:global(p) {
+			margin: 0.5rem 0;
+		}
+	}
 
-    :global(p) {
-      margin: .5rem 0;
-    }
-  }
+	main {
+		margin: auto;
+		max-width: 60rem;
+		background-size: 100% auto;
+		background-repeat: repeat-y;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
 
-  main {
-    margin: auto;
-    max-width: 60rem;
-    background-size: 100% auto;
-    background-repeat: repeat-y;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+		opacity: 0;
+		visibility: hidden;
+		animation: fadeIn 0.7s ease forwards;
 
-    opacity: 0;
-    visibility: hidden;
-    animation: fadeIn .7s ease forwards;
+		.response {
+			white-space: pre-wrap;
+		}
+	}
 
-    .response {
-      white-space: pre-wrap;
-    }
-  }
+	@keyframes fadeIn {
+		0% {
+			opacity: 0;
+			visibility: hidden;
+		}
+		75% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+			visibility: visible;
+		}
+	}
 
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      visibility: hidden;
-    }
-    75% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
+	.main-container {
+		margin-top: 30vh;
+		min-height: 70vh;
+		background-color: #fbf5f2;
+		padding: 0 10% 3rem 5%;
+	}
 
-  .main-container {
-    margin-top: 30vh;
-    min-height: 70vh;
-    background-color: #FBF5F2;
-    padding: 0 10% 3rem 5%;
-  }
+	.content {
+		position: relative;
+		top: -2rem;
+	}
 
-  .content {
-    position: relative;
-    top: -2rem;
-  }
+	h1 {
+		padding: 1rem;
+		margin: 0 0 0 -1rem;
+		border-radius: 1rem;
+		display: inline-block;
+		background-color: #fbf5f2;
+	}
 
-  h1 {
-    padding: 1rem;
-    margin: 0 0 0 -1rem;
-    border-radius: 1rem;
-    display: inline-block;
-    background-color: #FBF5F2;
-  }
+	.subheading {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: start;
 
-  .subheading {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: start;
+		:last-child {
+			margin-left: auto;
+		}
 
-    :last-child {
-      margin-left: auto;
-    }
-
-    p {
-      margin: 0;
-    }
-  }
-
+		p {
+			margin: 0;
+		}
+	}
 </style>

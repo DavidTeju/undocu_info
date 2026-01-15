@@ -6,11 +6,11 @@
 </main>
 
 <style lang="scss">
-  main {
+	main {
 		padding: 5rem 2rem;
 		align-items: center;
-    display: flex;
-    flex-direction: column;
+		display: flex;
+		flex-direction: column;
 		text-align: center;
-  }
+	}
 </style>
