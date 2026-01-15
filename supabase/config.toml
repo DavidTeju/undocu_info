@@ -149,7 +149,7 @@ otp_expiry = 3600
 # Customize email templates
 [auth.email.template.magiclink]
 subject = "Your Verification Code"
-content_path = "./templates/magiclink.html"
+content_path = "./supabase/templates/magiclink.html"
 
 # [auth.email.template.invite]
 # subject = "You have been invited"
