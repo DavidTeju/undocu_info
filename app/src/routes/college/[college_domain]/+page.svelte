@@ -65,10 +65,8 @@
 			{#each Object.entries(college.responses) as [category, responses]}
 				<h3>{question_categories[category as keyof typeof question_categories]}</h3>
 				<ul>
-					{#each responses as resp}
-						{@const questionText = resp.questions.question}
-						{@const responseText = resp.response}
-						{#if questionText !== 'Gives aid?'}
+					{#each responses as { questions: { question: questionText }, response: responseText }}
+						{#if questionText !== "Gives aid?"}
 							<!--TODO: Make a plan for this (gives aid)-->
 							<li class="response">
 								<span class="question">{questionText}</span>:
