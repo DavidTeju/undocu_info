@@ -1,12 +1,11 @@
 <script lang="ts">
 	import question_categories from '$lib/question_categories.json';
 	import Error from '$lib/components/Error.svelte';
-	// import type { Session } from '@supabase/supabase-js';
-	// import { supabase } from '$lib/supabaseClient';
-	// import { validEmailRegex } from '$lib/utils';
+	import type { Session } from '@supabase/supabase-js';
+	import { supabase } from '$lib/supabaseClientPublic';
+	import { validEmailRegex } from '$lib/utils';
 
 	const MAX_RESPONSE_LENGTH = 5000;
-	const PREVIEW_LENGTH = 150;
 
 	let { data, form } = $props();
 	const { questionsCategorized, collegeName } = data;
@@ -20,8 +19,83 @@
 	// Track which previews are expanded (read-only full view)
 	let expandedPreviews: Record<string, boolean> = $state({});
 
+	// Track which previews actually overflow and need "Show more"
+	let overflowingPreviews: Record<string, boolean> = $state({});
+
+	function checkOverflowAction(node: HTMLElement, params: { fieldId: string }) {
+		// Check overflow after the element is mounted and styled
+		const check = () => {
+			overflowingPreviews[params.fieldId] = node.scrollHeight > node.clientHeight;
+		};
+
+		// Use requestAnimationFrame to ensure styles are applied
+		requestAnimationFrame(check);
+
+		return {
+			update(newParams: { fieldId: string }) {
+				params = newParams;
+				requestAnimationFrame(check);
+			}
+		};
+	}
+
 	// Track edited values (separate from original response)
 	let editedValues: Record<string, string> = $state({});
+
+	// Confirmation modal state
+	let showConfirmModal = $state(false);
+	let formElement: HTMLFormElement;
+
+	// Build a map of question id -> question text for easy lookup
+	const questionMap: Record<string, string> = {};
+	const originalResponses: Record<string, string | null> = {};
+	for (const [_, questions] of Object.entries(questionsCategorized)) {
+		if (questions) {
+			for (const q of questions) {
+				questionMap[q.id.toString()] = q.question;
+				originalResponses[q.id.toString()] = q.response;
+			}
+		}
+	}
+
+	// Compute changes for the modal
+	type Change = {
+		fieldId: string;
+		question: string;
+		oldValue: string | null;
+		newValue: string;
+		isNew: boolean;
+	};
+
+	function getChanges(): Change[] {
+		const changes: Change[] = [];
+		for (const [fieldId, newValue] of Object.entries(editedValues)) {
+			const oldValue = originalResponses[fieldId];
+			const trimmedNew = newValue.trim();
+			const trimmedOld = oldValue?.trim() ?? '';
+
+			if (trimmedNew !== trimmedOld && trimmedNew.length > 0) {
+				changes.push({
+					fieldId,
+					question: questionMap[fieldId] ?? 'Unknown question',
+					oldValue: oldValue || null,
+					newValue: trimmedNew,
+					isNew: !oldValue || oldValue.trim().length === 0
+				});
+			}
+		}
+		return changes;
+	}
+
+	function handleReviewClick(e: Event) {
+		e.preventDefault();
+		showConfirmModal = true;
+	}
+
+	function confirmSubmit() {
+		showConfirmModal = false;
+		formElement.requestSubmit();
+	}
 
 	function toggleField(fieldId: string, originalResponse: string | null) {
 		if (!expandedFields[fieldId]) {
@@ -33,47 +107,53 @@
 		expandedFields[fieldId] = !expandedFields[fieldId];
 	}
 
-	function truncate(text: string | null, length: number): string {
-		if (!text) return '';
-		if (text.length <= length) return text;
-		return text.slice(0, length).trim() + '...';
-	}
+	// Auth state
+	let email = $state('');
+	let otp = $state('');
+	let otpSent = $state(false);
+	let authError = $state('');
+	let authLoading = $state(false);
 
-	// let email = $state('');
-	// let otp = $state('');
-	//
-	// let isValidEmail = $derived(validEmailRegex.test(email));
-	// let otpSent = $state(false);
+	let isValidEmail = $derived(validEmailRegex.test(email));
 
-	// let session: Session | null = $state(null);
-	// let isVerified = $derived(session !== null);
-	const isVerified = true;
+	let session: Session | null = $state(null);
+	let isVerified = $derived(session !== null);
 
-	// const verifyEmail = async () => {
-	// 	const { error } = await supabase.auth.signInWithOtp({
-	// 		email,
-	// 		options: {
-	// 			shouldCreateUser: true
-	// 		}
-	// 	});
-	// 	if (error) {
-	// 		console.error(error);
-	// 		//TODO: handle this
-	// 	} else {
-	// 		otpSent = true;
-	// 	}
-	// };
-	//
-	// const verifyOtp = async () => {
-	// 	const { data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' });
-	// 	if (error) {
-	// 		console.error(error);
-	// 		//TODO: handle this
-	// 	} else {
-	// 		session = data?.session;
-	// 		otpSent = false;
-	// 	}
-	// };
+	const sendOtp = async () => {
+		authError = '';
+		authLoading = true;
+		const { error } = await supabase.auth.signInWithOtp({
+			email,
+			options: {
+				shouldCreateUser: true
+			}
+		});
+		authLoading = false;
+		if (error) {
+			authError = error.message;
+		} else {
+			otpSent = true;
+		}
+	};
+
+	const verifyOtp = async () => {
+		authError = '';
+		authLoading = true;
+		const { data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' });
+		authLoading = false;
+		if (error) {
+			authError = error.message;
+		} else {
+			session = data?.session ?? null;
+			otpSent = false;
+		}
+	};
+
+	const resetAuth = () => {
+		otpSent = false;
+		otp = '';
+		authError = '';
+	};
 </script>
 
 <main>
@@ -82,27 +162,80 @@
 		<p class="college-name">{collegeName}</p>
 	</div>
 
-	<!--	<p>To suggest edits, please confirm your email address. This can be used to verify your identity.-->
-	<!--		If you work with the school in question, please use your work/.edu email address. I may contact you-->
-	<!--		via email to verify the information you input</p>-->
-	<!--{#if !isVerified}-->
-	<!--	<label for="email">Email Address:</label>-->
-	<!--	<input bind:value={email} type="email" id="email" name="email" required>-->
-	<!--	<button disabled={!isValidEmail} onclick={verifyEmail}>Send one time pin</button>-->
-	<!--	{#if otpSent}-->
-	<!--		<label for="otp">One Time Pin:</label>-->
-	<!--		<input bind:value={otp} type="text" id="otp" name="otp" required>-->
-	<!--		<button disabled={otp.length !== 6} onclick={verifyOtp}>Verify</button>-->
-	<!--	{/if}-->
-	<!--{:else}-->
-	<!--	<p>Verified!</p>-->
-	<!--{/if}-->
+	{#if !isVerified}
+		<div class="auth-section">
+			<p class="auth-intro">
+				To suggest edits, please verify your email address. This helps us maintain data quality.
+				If you work with the school, please use your work/.edu email.
+			</p>
+
+			{#if authError}
+				<div class="auth-error">{authError}</div>
+			{/if}
+
+			{#if !otpSent}
+				<div class="auth-form">
+					<label for="email">Email Address</label>
+					<input
+						bind:value={email}
+						type="email"
+						id="email"
+						name="email"
+						placeholder="your@email.com"
+						disabled={authLoading}
+						onkeydown={(e) => e.key === 'Enter' && isValidEmail && !authLoading && sendOtp()}
+					/>
+					<button
+						type="button"
+						class="auth-btn"
+						disabled={!isValidEmail || authLoading}
+						onclick={sendOtp}
+					>
+						{authLoading ? 'Sending...' : 'Send verification code'}
+					</button>
+				</div>
+			{:else}
+				<div class="auth-form">
+					<p class="otp-sent-msg">We sent a 6-digit code to <strong>{email}</strong></p>
+					<label for="otp">Verification Code</label>
+					<input
+						bind:value={otp}
+						type="text"
+						id="otp"
+						name="otp"
+						placeholder="000000"
+						maxlength="6"
+						disabled={authLoading}
+						onkeydown={(e) => e.key === 'Enter' && otp.length === 6 && !authLoading && verifyOtp()}
+					/>
+					<div class="auth-actions">
+						<button
+							type="button"
+							class="auth-btn secondary"
+							onclick={resetAuth}
+							disabled={authLoading}
+						>
+							Change email
+						</button>
+						<button
+							type="button"
+							class="auth-btn"
+							disabled={otp.length !== 6 || authLoading}
+							onclick={verifyOtp}
+						>
+							{authLoading ? 'Verifying...' : 'Verify'}
+						</button>
+					</div>
+				</div>
+			{/if}
+		</div>
+	{/if}
 
 	{#if !form?.success && form?.reason}
 		<Error message={form.reason} />
 	{/if}
 
-	<form method="post">
+	<form method="post" bind:this={formElement}>
 		{#each Object.entries(question_categories) as [category, categoryText]}
 			<section class="category" class:disabled={!isVerified}>
 				<h2>{categoryText}</h2>
@@ -149,19 +282,22 @@
 							{:else}
 								{@const displayValue = editedValues[fieldId] ?? response}
 								{@const hasDisplayContent = displayValue && displayValue.trim().length > 0}
-								{@const isTruncated = displayValue && displayValue.length > PREVIEW_LENGTH}
-								{@const remainingChars = displayValue ? displayValue.length - PREVIEW_LENGTH : 0}
 								{@const isPreviewExpanded = expandedPreviews[fieldId]}
+								{@const hasOverflow = overflowingPreviews[fieldId] ?? true}
+								{@const overflowChecked = fieldId in overflowingPreviews}
 								{#if hasDisplayContent}
-									<div class="preview-container" class:truncated={isTruncated && !isPreviewExpanded}>
-										<p class="preview">{isPreviewExpanded ? displayValue : truncate(displayValue, PREVIEW_LENGTH)}</p>
-										{#if isTruncated}
+									<div class="preview-container" class:collapsed={!isPreviewExpanded} class:truncated={!isPreviewExpanded && hasOverflow && overflowChecked}>
+										<p
+											class="preview"
+											use:checkOverflowAction={{ fieldId }}
+										>{displayValue}</p>
+										{#if hasOverflow}
 											<button
 												type="button"
 												class="more-indicator"
 												onclick={() => expandedPreviews[fieldId] = !isPreviewExpanded}
 											>
-												{isPreviewExpanded ? 'Show less' : `+${remainingChars} more characters`}
+												{isPreviewExpanded ? 'Show less' : 'Show more'}
 											</button>
 										{/if}
 									</div>
@@ -180,10 +316,80 @@
 		{/each}
 
 		<div class="submit-container">
-			<button class="submit" type="submit">Submit Changes</button>
+			<button class="submit" type="button" onclick={handleReviewClick}>Review Changes</button>
 		</div>
 	</form>
 </main>
+
+<!-- Confirmation Modal -->
+{#if showConfirmModal}
+	{@const changes = getChanges()}
+	<div
+		class="modal-backdrop"
+		role="button"
+		tabindex="-1"
+		onclick={() => showConfirmModal = false}
+		onkeydown={(e) => e.key === 'Escape' && (showConfirmModal = false)}
+	>
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
+			<div class="modal-header">
+				<h2 id="modal-title">{changes.length > 0 ? 'Review Your Changes' : 'No Changes'}</h2>
+				{#if changes.length > 0}
+					<p>{changes.length} {changes.length === 1 ? 'change' : 'changes'} to submit</p>
+				{/if}
+			</div>
+
+			<div class="modal-body">
+				{#if changes.length === 0}
+					<div class="no-changes">
+						<p>You haven't made any changes yet.</p>
+						<p>Click "Add" or "Edit" on any field to suggest an update.</p>
+					</div>
+				{:else}
+					{#each changes as change}
+						<div class="change-card">
+							<h3 class="change-question">{change.question}</h3>
+							{#if change.isNew}
+								<div class="change-new">
+									<span class="change-label new">New</span>
+									<p class="change-value">{change.newValue}</p>
+								</div>
+							{:else}
+								<div class="change-diff">
+									<div class="change-old">
+										<span class="change-label old">Before</span>
+										<p class="change-value">{change.oldValue}</p>
+									</div>
+									<div class="change-arrow">→</div>
+									<div class="change-new">
+										<span class="change-label new">After</span>
+										<p class="change-value">{change.newValue}</p>
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/each}
+				{/if}
+			</div>
+
+			<div class="modal-footer">
+				{#if changes.length > 0}
+					<button class="modal-btn secondary" onclick={() => showConfirmModal = false}>
+						Back to Editing
+					</button>
+					<button class="modal-btn primary" onclick={confirmSubmit}>
+						Confirm & Submit
+					</button>
+				{:else}
+					<button class="modal-btn primary" onclick={() => showConfirmModal = false}>
+						Go Back
+					</button>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
   main {
@@ -207,6 +413,120 @@
       margin: 0;
       font-size: 1.25rem;
       color: #555;
+    }
+  }
+
+  // Auth section styles
+  .auth-section {
+    max-width: 28rem;
+    margin: 0 auto 2rem;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(39, 40, 56, 0.15);
+  }
+
+  .auth-intro {
+    margin: 0 0 1.25rem 0;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .auth-error {
+    background-color: rgba(200, 50, 50, 0.1);
+    color: #a03030;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    label {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    input {
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(39, 40, 56, 0.2);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
+
+      &:focus {
+        outline: none;
+        border-color: #272838;
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+
+      &:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+      }
+    }
+
+    input#otp {
+      text-align: center;
+      font-size: 1.25rem;
+      letter-spacing: 0.5em;
+      font-family: monospace;
+    }
+  }
+
+  .otp-sent-msg {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #555;
+    text-align: center;
+  }
+
+  .auth-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .auth-btn {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    background-color: #272838;
+    color: #FBF5F2;
+
+    &:hover:not(:disabled) {
+      background-color: #3a3b4d;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &.secondary {
+      background-color: transparent;
+      border: 1px solid #272838;
+      color: #272838;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(39, 40, 56, 0.05);
+      }
     }
   }
 
@@ -302,9 +622,14 @@
     margin-top: 0.75rem;
     position: relative;
 
+    &.collapsed .preview {
+      max-height: 4.5em; // ~3 lines with 1.5 line-height
+      overflow: hidden;
+    }
+
     &.truncated .preview {
-      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
     }
   }
 
@@ -446,6 +771,209 @@
     // Add padding at bottom to prevent content being hidden by fixed button
     form {
       padding-bottom: 5rem;
+    }
+  }
+
+  // Modal styles
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+    backdrop-filter: blur(2px);
+  }
+
+  .modal {
+    background-color: #FBF5F2;
+    border-radius: 1rem;
+    max-width: 40rem;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid rgba(39, 40, 56, 0.1);
+
+    h2 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #272838;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+  }
+
+  .no-changes {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #666;
+
+    p {
+      margin: 0.5rem 0;
+
+      &:first-child {
+        font-size: 1rem;
+        color: #444;
+      }
+
+      &:last-child {
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  .change-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(39, 40, 56, 0.1);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .change-question {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #272838;
+  }
+
+  .change-label {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.5rem;
+
+    &.old {
+      background-color: rgba(200, 50, 50, 0.15);
+      color: #a03030;
+    }
+
+    &.new {
+      background-color: rgba(50, 150, 80, 0.15);
+      color: #207040;
+    }
+  }
+
+  .change-value {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #444;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .change-diff {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .change-old,
+  .change-new {
+    min-width: 0;
+  }
+
+  .change-arrow {
+    color: #888;
+    font-size: 1.25rem;
+    padding-top: 1.5rem;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid rgba(39, 40, 56, 0.1);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .modal-btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &.secondary {
+      border: 1px solid #272838;
+      background-color: transparent;
+      color: #272838;
+
+      &:hover {
+        background-color: rgba(39, 40, 56, 0.05);
+      }
+    }
+
+    &.primary {
+      border: none;
+      background-color: #272838;
+      color: #FBF5F2;
+
+      &:hover {
+        background-color: #3a3b4d;
+      }
+    }
+  }
+
+  // Modal mobile responsiveness
+  @media screen and (max-width: 600px) {
+    .modal {
+      max-height: 90vh;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .change-diff {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .change-arrow {
+      display: none;
+    }
+
+    .modal-footer {
+      flex-direction: column-reverse;
+    }
+
+    .modal-btn {
+      width: 100%;
+      text-align: center;
     }
   }
 </style>
