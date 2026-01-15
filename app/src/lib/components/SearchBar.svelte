@@ -37,7 +37,7 @@
     position: absolute;
     right: 0.5rem;
     margin: auto 0;
-    height: 100%
+    height: 100%;
   }
 
   div {
