@@ -97,7 +97,7 @@ enabled = true
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:3000"
+site_url = "https://undocustudent.org"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = ["https://127.0.0.1:3000"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
@@ -146,7 +146,11 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Uncomment to customize email template
+# Customize email templates
+[auth.email.template.magiclink]
+subject = "Your Verification Code"
+content_path = "./templates/magiclink.html"
+
 # [auth.email.template.invite]
 # subject = "You have been invited"
 # content_path = "./templates/invite.html"
