@@ -45,11 +45,15 @@ model responses {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Suggestions {
-  id             BigInt   @id @default(autoincrement())
-  created_at     DateTime @default(now()) @db.Timestamptz(6)
-  content        Json     @db.Json
-  college_domain String
-  colleges       colleges @relation(fields: [college_domain], references: [domain], onDelete: Cascade, onUpdate: NoAction)
+  id              BigInt    @id @default(autoincrement())
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  content         Json      @db.Json
+  college_domain  String
+  status          String    @default("pending") // pending, approved, rejected
+  reviewed_at     DateTime? @db.Timestamptz(6)
+  submitter_email String?
+  remarks         String?   // Additional comments from the submitter
+  colleges        colleges  @relation(fields: [college_domain], references: [domain], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum question_category {
