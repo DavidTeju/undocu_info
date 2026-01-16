@@ -160,8 +160,8 @@ export const actions = {
 			response
 		}));
 
-		if (suggestions.length === 0) {
-			return fail(400, { success: false, reason: 'No changes detected' });
+		if (suggestions.length === 0 && !remarks) {
+			return fail(400, { success: false, reason: 'No changes or notes detected' });
 		}
 
 		const suggestionsAsObject = Object.fromEntries(questionswithSuggestions.map((q) => [q.id, q]));
