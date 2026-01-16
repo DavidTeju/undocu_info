@@ -64,7 +64,7 @@ undocu_info/
    npm run dev
    ```
 
-See [app/README.md](./app/README.md) for detailed app documentation and [supabase/README.md](./supabase/README.md) for Supabase setup.
+See [app/README.md](./app/README.md) for detailed app documentation and [deploy/README.md](./deploy/README.md) for Supabase setup.
 
 ## License
 
