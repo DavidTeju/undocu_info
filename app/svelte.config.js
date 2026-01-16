@@ -18,7 +18,8 @@ const config = {
 				'script-src': [
 					'self',
 					'unsafe-hashes',
-					'sha256-7dQwUgLau1NFCCGjfn9FsYptB6ZtWxJin6VohGIu20I='
+					'sha256-7dQwUgLau1NFCCGjfn9FsYptB6ZtWxJin6VohGIu20I=',
+					'https://analytics.undocustudent.org'
 				]
 			},
 			// must be specified with either the `report-uri` or `report-to` directives, or both
