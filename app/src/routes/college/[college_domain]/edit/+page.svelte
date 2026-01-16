@@ -373,6 +373,8 @@
 <!-- Confirmation Modal -->
 {#if showConfirmModal}
 	{@const changes = getChanges()}
+	{@const hasRemarks = remarks.trim().length > 0}
+	{@const hasContent = changes.length > 0 || hasRemarks}
 	<div
 		class="modal-backdrop"
 		role="button"
@@ -390,52 +392,78 @@
 			onkeydown={(e) => e.stopPropagation()}
 		>
 			<div class="modal-header">
-				<h2 id="modal-title">{changes.length > 0 ? 'Review Your Changes' : 'No Changes'}</h2>
+				<h2 id="modal-title">
+					{#if !hasContent}
+						Nothing to Submit
+					{:else if changes.length > 0 && hasRemarks}
+						Review Your Submission
+					{:else if changes.length > 0}
+						Review Your Changes
+					{:else}
+						Review Your Note
+					{/if}
+				</h2>
 				{#if changes.length > 0}
-					<p>{changes.length} {changes.length === 1 ? 'change' : 'changes'} to submit</p>
+					<p>{changes.length} {changes.length === 1 ? 'change' : 'changes'}{hasRemarks ? ' + note' : ''}</p>
+				{:else if hasRemarks}
+					<p>Note only (no field changes)</p>
 				{/if}
 			</div>
 
 			<div class="modal-body">
-				{#if changes.length === 0}
+				{#if !hasContent}
 					<div class="no-changes">
-						<p>You haven't made any changes yet.</p>
-						<p>Click "Add" or "Edit" on any field to suggest an update.</p>
+						<p>You haven't made any changes or added any notes yet.</p>
+						<p>Edit a field or add a note to submit feedback.</p>
 					</div>
 				{:else}
-					{#each changes as change}
-						<div class="change-card" class:delete-card={change.isDelete}>
-							<h3 class="change-question">{change.question}</h3>
-							{#if change.isDelete}
-								<div class="change-delete">
-									<span class="change-label delete">Delete</span>
-									<p class="change-value deleted">{change.oldValue}</p>
-								</div>
-							{:else if change.isNew}
-								<div class="change-new">
-									<span class="change-label new">New</span>
-									<p class="change-value">{change.newValue}</p>
-								</div>
-							{:else}
-								<div class="change-diff">
-									<div class="change-old">
-										<span class="change-label old">Before</span>
-										<p class="change-value">{change.oldValue}</p>
+					{#if changes.length > 0}
+						{#each changes as change}
+							<div class="change-card" class:delete-card={change.isDelete}>
+								<h3 class="change-question">{change.question}</h3>
+								{#if change.isDelete}
+									<div class="change-delete">
+										<span class="change-label delete">Delete</span>
+										<p class="change-value deleted">{change.oldValue}</p>
 									</div>
-									<div class="change-arrow">→</div>
+								{:else if change.isNew}
 									<div class="change-new">
-										<span class="change-label new">After</span>
+										<span class="change-label new">New</span>
 										<p class="change-value">{change.newValue}</p>
 									</div>
-								</div>
-							{/if}
+								{:else}
+									<div class="change-diff">
+										<div class="change-old">
+											<span class="change-label old">Before</span>
+											<p class="change-value">{change.oldValue}</p>
+										</div>
+										<div class="change-arrow">→</div>
+										<div class="change-new">
+											<span class="change-label new">After</span>
+											<p class="change-value">{change.newValue}</p>
+										</div>
+									</div>
+								{/if}
+							</div>
+						{/each}
+					{/if}
+
+					{#if hasRemarks}
+						<div class="remarks-display" class:standalone={changes.length === 0}>
+							<div class="remarks-header">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+								</svg>
+								<span>Your Note</span>
+							</div>
+							<p class="remarks-content">{remarks}</p>
 						</div>
-					{/each}
+					{/if}
 				{/if}
 			</div>
 
 			<div class="modal-footer">
-				{#if changes.length > 0}
+				{#if hasContent}
 					<button class="modal-btn secondary" onclick={() => (showConfirmModal = false)}>
 						Back to Editing
 					</button>
@@ -970,6 +998,46 @@
 	.change-card.delete-card {
 		border-color: rgba(200, 50, 50, 0.3);
 		background-color: rgba(200, 50, 50, 0.05);
+	}
+
+	.remarks-display {
+		margin-top: 1.5rem;
+		padding: 1.25rem;
+		background: linear-gradient(135deg, rgba(107, 91, 79, 0.08) 0%, rgba(107, 91, 79, 0.04) 100%);
+		border-radius: 0.75rem;
+		border: 1px solid rgba(107, 91, 79, 0.15);
+
+		&.standalone {
+			margin-top: 0;
+			background: linear-gradient(135deg, rgba(107, 91, 79, 0.1) 0%, rgba(107, 91, 79, 0.05) 100%);
+		}
+
+		.remarks-header {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin-bottom: 0.75rem;
+			color: #6b5b4f;
+
+			svg {
+				opacity: 0.7;
+			}
+
+			span {
+				font-size: 0.8rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.03em;
+			}
+		}
+
+		.remarks-content {
+			margin: 0;
+			font-size: 0.95rem;
+			line-height: 1.6;
+			color: #444;
+			white-space: pre-wrap;
+		}
 	}
 
 	.change-value.deleted {
