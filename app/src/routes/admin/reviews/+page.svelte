@@ -339,26 +339,26 @@
 	}
 
 	.remarks {
-		margin: 0 1.5rem;
-		padding: 1rem;
-		background-color: rgba(39, 40, 56, 0.04);
-		border-radius: 0.5rem;
-		border-left: 3px solid rgba(39, 40, 56, 0.2);
+		margin: 0 1.5rem 1.5rem;
+		padding: 1rem 1.25rem;
+		background: linear-gradient(135deg, rgba(107, 91, 79, 0.08) 0%, rgba(107, 91, 79, 0.03) 100%);
+		border-radius: 0.75rem;
+		border: 1px solid rgba(107, 91, 79, 0.12);
 
 		h4 {
 			margin: 0 0 0.5rem 0;
-			font-size: 0.8rem;
+			font-size: 0.75rem;
 			font-weight: 600;
-			color: #666;
+			color: #6b5b4f;
 			text-transform: uppercase;
-			letter-spacing: 0.03em;
+			letter-spacing: 0.04em;
 		}
 
 		p {
 			margin: 0;
 			font-size: 0.9rem;
-			line-height: 1.5;
-			color: #444;
+			line-height: 1.6;
+			color: #4a3f36;
 			white-space: pre-wrap;
 		}
 	}
