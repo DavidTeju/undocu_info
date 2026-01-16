@@ -64,7 +64,7 @@
 	// Build a map of question id -> question text for easy lookup
 	const questionMap: Record<string, string> = {};
 	const originalResponses: Record<string, string | null> = {};
-	for (const [_, questions] of Object.entries(questionsCategorized)) {
+	for (const [_category, questions] of Object.entries(questionsCategorized)) {
 		if (questions) {
 			for (const q of questions) {
 				questionMap[q.id.toString()] = q.question;

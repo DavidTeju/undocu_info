@@ -32,6 +32,10 @@ export default [
 	},
 	{
 		rules: {
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+			],
 			'array-callback-return': 'error',
 			'no-template-curly-in-string': 'warn',
 			'no-control-regex': 0

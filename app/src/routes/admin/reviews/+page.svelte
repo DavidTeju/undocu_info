@@ -70,7 +70,7 @@
 					</header>
 
 					<div class="changes">
-						{#each Object.entries(suggestion.content) as [questionId, change]}
+						{#each Object.entries(suggestion.content) as [_questionId, change]}
 							<div class="change-item">
 								<h3 class="question">{change.question}</h3>
 								{#if change.oldResponse && !change.response}

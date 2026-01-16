@@ -127,6 +127,7 @@
 							<!--TODO: Make a plan for this (gives aid)-->
 							<li class="response">
 								<span class="question">{questionText}</span>:
+								<!-- eslint-disable-next-line svelte/no-at-html-tags -- linkify sanitizes output -->
 								{@html linkify(responseText)}
 							</li>
 						{/if}
