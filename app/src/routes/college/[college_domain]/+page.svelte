@@ -20,30 +20,65 @@
 				.replace(/>/g, '&gt;')
 				.replace(/"/g, '&quot;');
 
-		// Store URLs/emails and replace with placeholders before escaping
-		const links: Array<{ type: 'url' | 'email'; value: string }> = [];
-		let processed = text
-			.replaceAll(/["']/g, '"')
-			.replace(validUrlRegex, (url) => {
-				links.push({ type: 'url', value: url });
-				return `\x00LINK${links.length - 1}\x00`;
-			})
-			.replace(validEmailRegex, (email) => {
-				links.push({ type: 'email', value: email });
-				return `\x00LINK${links.length - 1}\x00`;
-			});
+		// Check if href uses a safe protocol (http, https, mailto, tel, or relative path)
+		const isSafeHref = (href: string): boolean => {
+			const trimmed = href.trim().toLowerCase();
+			if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) return true;
+			// Allow relative paths (no colon, or colon comes after first slash)
+			const colonIdx = trimmed.indexOf(':');
+			return colonIdx === -1 || (trimmed.indexOf('/') !== -1 && trimmed.indexOf('/') < colonIdx);
+		};
 
-		// Escape HTML in the text (placeholders are safe)
+		const preserved: string[] = [];
+
+		// Step 1: Extract and validate existing anchor tags
+		let processed = text.replace(
+			/<a\s+[^>]*href\s*=\s*["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi,
+			(match, href, content) => {
+				if (isSafeHref(href)) {
+					// Allow safe inline tags inside anchors, escape everything else
+					const inlineTags: string[] = [];
+					const safeContent = content
+						.replace(/<(\/?)(b|i|strong|em|u)>/gi, (_: string, slash: string, tag: string) => {
+							inlineTags.push(`<${slash}${tag}>`);
+							return `\x01IT${inlineTags.length - 1}\x01`;
+						})
+						.replace(/<[^>]*>/g, (tag: string) => escapeHtml(tag))
+						.replace(/\x01IT(\d+)\x01/g, (_: string, i: string) => inlineTags[parseInt(i)]);
+					const safeHref = escapeHtml(href);
+					preserved.push(`<a href="${safeHref}" target="_blank" rel="noopener noreferrer">${safeContent}</a>`);
+				} else {
+					preserved.push(escapeHtml(match));
+				}
+				return `\x00P${preserved.length - 1}\x00`;
+			}
+		);
+
+		// Step 2: Preserve safe standalone tags (p, br)
+		processed = processed.replace(/<(\/?)(p|br)\s*\/?>/gi, (match) => {
+			preserved.push(match);
+			return `\x00P${preserved.length - 1}\x00`;
+		});
+
+		// Step 3: Extract bare URLs (not already inside anchor tags)
+		processed = processed.replace(validUrlRegex, (url) => {
+			const escaped = escapeHtml(url);
+			preserved.push(`<a href="${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`);
+			return `\x00P${preserved.length - 1}\x00`;
+		});
+
+		// Step 4: Extract bare emails
+		processed = processed.replace(validEmailRegex, (email) => {
+			const escaped = escapeHtml(email);
+			preserved.push(`<a href="mailto:${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`);
+			return `\x00P${preserved.length - 1}\x00`;
+		});
+
+		// Step 5: Escape everything else
 		processed = escapeHtml(processed);
 
-		// Replace placeholders with anchor tags
-		return processed.replace(/\x00LINK(\d+)\x00/g, (_, i) => {
-			const { type, value } = links[parseInt(i)];
-			const escaped = escapeHtml(value);
-			return type === 'url'
-				? `<a href="${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`
-				: `<a href="mailto:${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`;
-		});
+		// Step 6: Restore preserved items
+		return processed.replace(/\x00P(\d+)\x00/g, (_, i) => preserved[parseInt(i)]);
 	}
 </script>
 
