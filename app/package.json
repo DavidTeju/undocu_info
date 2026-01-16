@@ -23,6 +23,7 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.45.1",
 		"globals": "^15.0.0",
+		"playwright": "^1.57.0",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.2.6",
 		"prisma": "^6.3.1",
@@ -35,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^6.3.1",
+		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.47.10",
 		"@sveltejs/adapter-node": "^5.2.12",
 		"@tailwindcss/vite": "^4.0.0",
