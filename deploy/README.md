@@ -111,14 +111,14 @@ Frontend analytics at https://analytics.undocustudent.org
 
 ## Email Templates
 
-Templates are served via nginx from `/root/supabase-docker/volumes/templates/`:
+Templates are served via nginx from `/var/www/email-templates/`:
 - `magiclink.html` - OTP verification emails
 
-Template URL: `https://files.undocustudent.org/templates/magiclink.html`
+Template URL: `https://undocustudent.org/email-templates/magiclink.html`
 
 When updating templates:
 1. Edit the template in this repo (`deploy/templates/`)
-2. Copy to VPS: `scp deploy/templates/* root@82.29.152.139:/root/supabase-docker/volumes/templates/`
+2. Copy to VPS: `scp deploy/templates/* root@82.29.152.139:/var/www/email-templates/`
 
 ## Backups
 
@@ -185,7 +185,7 @@ For ANON_KEY and SERVICE_ROLE_KEY, use the Supabase JWT generator or create manu
 
 Files subdomain serves:
 - `/` → Kong API gateway (port 8000)
-- `/templates/` → Static email templates
 
 Main domain serves:
-- `/` → App container (port 3000)
+- `/email-templates/` → Static email templates (nginx)
+- `/` → App container (port 4173)

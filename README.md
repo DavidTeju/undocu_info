@@ -23,9 +23,9 @@ undocu_info/
 │   │   ├── routes/        # Page routes
 │   │   └── lib/           # Shared components and utilities
 │   └── prisma/            # Database schema
-├── supabase/              # Supabase configuration
-│   ├── config.toml        # Supabase settings
-│   └── templates/         # Email templates
+├── deploy/                # Infrastructure configuration
+│   ├── templates/         # Email templates
+│   └── .env.example       # Supabase environment template
 └── miscellaneous_data/    # Supporting data files
 ```
 
@@ -64,7 +64,7 @@ undocu_info/
    npm run dev
    ```
 
-See [app/README.md](./app/README.md) for detailed app documentation and [deploy/README.md](./deploy/README.md) for Supabase setup.
+See [app/README.md](./app/README.md) for detailed app documentation and [deploy/README.md](./deploy/README.md) for infrastructure setup.
 
 ## License
 
