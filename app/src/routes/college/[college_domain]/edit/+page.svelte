@@ -1,8 +1,8 @@
 <script lang="ts">
-	import question_categories from '$lib/question_categories.json';
+	import  question_categories  from '$lib/question_categories.json';
 	import Error from '$lib/components/Error.svelte';
 	import { enhance } from '$app/forms';
-	import { validEmailRegex } from '$lib/utils';
+	import { emailValidationRegex } from '$lib/utils';
 
 	const MAX_RESPONSE_LENGTH = 5000;
 
@@ -138,7 +138,7 @@
 	let authError = $state('');
 	let authLoading = $state(false);
 
-	let isValidEmail = $derived(validEmailRegex.test(email));
+	let isValidEmail = $derived(emailValidationRegex.test(email));
 
 	// Track verified email - either from server (existing session) or from OTP verification
 	let verifiedEmail: string | null = $state(userEmail);
