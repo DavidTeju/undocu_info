@@ -17,7 +17,8 @@
 			<div class="unauthorized">
 				<p>
 					{#if data.userEmail}
-						You're signed in as <strong>{data.userEmail}</strong>, but this account doesn't have admin access.
+						You're signed in as <strong>{data.userEmail}</strong>, but this account doesn't have
+						admin access.
 					{:else}
 						You don't have admin access.
 					{/if}

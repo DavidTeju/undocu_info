@@ -23,7 +23,11 @@
 <main>
 	<div class="header">
 		<h1>Review Suggestions</h1>
-		<p class="subtitle">{data.suggestions.length} pending {data.suggestions.length === 1 ? 'suggestion' : 'suggestions'}</p>
+		<p class="subtitle">
+			{data.suggestions.length} pending {data.suggestions.length === 1
+				? 'suggestion'
+				: 'suggestions'}
+		</p>
 	</div>
 
 	{#if form?.success}
@@ -64,12 +68,12 @@
 							{/if}
 						</div>
 					</header>
-					
+
 					<div class="changes">
-					{#each Object.entries(suggestion.content) as [questionId, change]}
-						<div class="change-item">
-							<h3 class="question">{change.question}</h3>
-							{#if change.oldResponse && !change.response}
+						{#each Object.entries(suggestion.content) as [questionId, change]}
+							<div class="change-item">
+								<h3 class="question">{change.question}</h3>
+								{#if change.oldResponse && !change.response}
 									<div class="delete-only">
 										<span class="label">Delete</span>
 										<p>{change.oldResponse}</p>
@@ -121,7 +125,7 @@
 
 <style lang="scss">
 	main {
-		background-color: #FBF5F2;
+		background-color: #fbf5f2;
 		min-height: 100vh;
 		padding: 2rem clamp(1rem, 5vw, 4rem);
 		color: #272838;

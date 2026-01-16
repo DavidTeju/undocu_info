@@ -24,7 +24,10 @@ export const load: PageServerLoad = async () => {
 		suggestions: suggestions.map((s) => ({
 			id: s.id.toString(),
 			created_at: s.created_at,
-			content: s.content as Record<string, { id: number; question: string; oldResponse: string | null; response: string }>,
+			content: s.content as Record<
+				string,
+				{ id: number; question: string; oldResponse: string | null; response: string }
+			>,
 			college_domain: s.college_domain,
 			college_name: s.colleges.name,
 			status: s.status,
@@ -52,7 +55,10 @@ export const actions = {
 			return fail(404, { error: 'Suggestion not found' });
 		}
 
-		const content = suggestion.content as Record<string, { id: number; question: string; oldResponse: string | null; response: string }>;
+		const content = suggestion.content as Record<
+			string,
+			{ id: number; question: string; oldResponse: string | null; response: string }
+		>;
 
 		// Apply each change to the responses table
 		for (const [questionId, change] of Object.entries(content)) {

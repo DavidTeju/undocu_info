@@ -57,7 +57,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 
 			// Check if user is an allowed admin
-			const adminEmails = (env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase());
+			const adminEmails = (env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase());
 			if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) {
 				throw redirect(303, '/admin/login?error=unauthorized');
 			}

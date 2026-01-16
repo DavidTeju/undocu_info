@@ -46,7 +46,9 @@
 						.replace(/<[^>]*>/g, (tag: string) => escapeHtml(tag))
 						.replace(/\x01IT(\d+)\x01/g, (_: string, i: string) => inlineTags[parseInt(i)]);
 					const safeHref = escapeHtml(href);
-					preserved.push(`<a href="${safeHref}" target="_blank" rel="noopener noreferrer">${safeContent}</a>`);
+					preserved.push(
+						`<a href="${safeHref}" target="_blank" rel="noopener noreferrer">${safeContent}</a>`
+					);
 				} else {
 					preserved.push(escapeHtml(match));
 				}
@@ -63,14 +65,18 @@
 		// Step 3: Extract bare URLs (not already inside anchor tags)
 		processed = processed.replace(validUrlRegex, (url) => {
 			const escaped = escapeHtml(url);
-			preserved.push(`<a href="${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`);
+			preserved.push(
+				`<a href="${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`
+			);
 			return `\x00P${preserved.length - 1}\x00`;
 		});
 
 		// Step 4: Extract bare emails
 		processed = processed.replace(validEmailRegex, (email) => {
 			const escaped = escapeHtml(email);
-			preserved.push(`<a href="mailto:${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`);
+			preserved.push(
+				`<a href="mailto:${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`
+			);
 			return `\x00P${preserved.length - 1}\x00`;
 		});
 
@@ -95,9 +101,19 @@
 				{/if}
 				<a href="https://{domain}.edu">https://{domain}.edu</a>
 				<a href="/college/{domain}/edit" class="suggest-edit">
-					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M12 20h9"/>
-						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M12 20h9" />
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
 					</svg>
 					Suggest an edit
 				</a>
@@ -107,7 +123,7 @@
 				<h3>{question_categories[category as keyof typeof question_categories]}</h3>
 				<ul>
 					{#each responses as { questions: { question: questionText }, response: responseText }}
-						{#if questionText !== "Gives aid?"}
+						{#if questionText !== 'Gives aid?'}
 							<!--TODO: Make a plan for this (gives aid)-->
 							<li class="response">
 								<span class="question">{questionText}</span>:

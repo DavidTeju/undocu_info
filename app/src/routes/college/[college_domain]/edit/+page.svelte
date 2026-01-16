@@ -1,5 +1,5 @@
 <script lang="ts">
-	import  question_categories  from '$lib/question_categories.json';
+	import question_categories from '$lib/question_categories.json';
 	import Error from '$lib/components/Error.svelte';
 	import { enhance } from '$app/forms';
 	import { emailValidationRegex } from '$lib/utils';
@@ -165,7 +165,9 @@
 			<button
 				type="button"
 				class="auth-btn secondary small"
-				onclick={() => { verifiedEmail = null; }}
+				onclick={() => {
+					verifiedEmail = null;
+				}}
 			>
 				Use different email
 			</button>
@@ -204,11 +206,7 @@
 						placeholder="your@email.com"
 						disabled={authLoading}
 					/>
-					<button
-						type="submit"
-						class="auth-btn"
-						disabled={!isValidEmail || authLoading}
-					>
+					<button type="submit" class="auth-btn" disabled={!isValidEmail || authLoading}>
 						{authLoading ? 'Sending...' : 'Send verification code'}
 					</button>
 				</form>
@@ -247,11 +245,7 @@
 						>
 							Change email
 						</button>
-						<button
-							type="submit"
-							class="auth-btn"
-							disabled={otp.length !== 6 || authLoading}
-						>
+						<button type="submit" class="auth-btn" disabled={otp.length !== 6 || authLoading}>
 							{authLoading ? 'Verifying...' : 'Verify'}
 						</button>
 					</div>
@@ -404,7 +398,10 @@
 					{/if}
 				</h2>
 				{#if changes.length > 0}
-					<p>{changes.length} {changes.length === 1 ? 'change' : 'changes'}{hasRemarks ? ' + note' : ''}</p>
+					<p>
+						{changes.length}
+						{changes.length === 1 ? 'change' : 'changes'}{hasRemarks ? ' + note' : ''}
+					</p>
 				{:else if hasRemarks}
 					<p>Note only (no field changes)</p>
 				{/if}
@@ -451,8 +448,18 @@
 					{#if hasRemarks}
 						<div class="remarks-display" class:standalone={changes.length === 0}>
 							<div class="remarks-header">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
 								</svg>
 								<span>Your Note</span>
 							</div>

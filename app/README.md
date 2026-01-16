@@ -21,14 +21,14 @@ npm run format
 
 ## Routes
 
-| Route | Description |
-|-------|-------------|
-| `/` | Home page - lists all colleges grouped by state with search |
-| `/college/[domain]` | College detail page - shows policy Q&A for a specific college |
+| Route                    | Description                                                        |
+| ------------------------ | ------------------------------------------------------------------ |
+| `/`                      | Home page - lists all colleges grouped by state with search        |
+| `/college/[domain]`      | College detail page - shows policy Q&A for a specific college      |
 | `/college/[domain]/edit` | Suggest edits to college information (requires email verification) |
-| `/admin/login` | Admin login page |
-| `/admin/reviews` | Admin dashboard to review/approve/reject suggested edits |
-| `/thanks` | Thank you page after submitting suggestions |
+| `/admin/login`           | Admin login page                                                   |
+| `/admin/reviews`         | Admin dashboard to review/approve/reject suggested edits           |
+| `/thanks`                | Thank you page after submitting suggestions                        |
 
 ## Key Components
 
@@ -65,6 +65,7 @@ The app uses Prisma with PostgreSQL. Key models:
 - **emailaddresses** - Contact emails associated with colleges
 
 Generate the Prisma client after schema changes:
+
 ```bash
 npx prisma generate
 ```

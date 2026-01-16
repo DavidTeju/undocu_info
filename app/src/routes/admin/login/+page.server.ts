@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const unauthorized = url.searchParams.get('error') === 'unauthorized';
 
 	if (session && user?.email) {
-		const adminEmails = (env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase());
+		const adminEmails = (env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase());
 		const isAdmin = adminEmails.includes(user.email.toLowerCase());
 
 		if (isAdmin) {
