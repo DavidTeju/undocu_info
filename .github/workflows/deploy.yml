@@ -12,6 +12,11 @@ jobs:
     defaults:
       run:
         working-directory: ./app
+    env:
+      # Public env vars needed for SvelteKit type checking
+      PUBLIC_SUPABASE_URL: 'https://placeholder.supabase.co'
+      PUBLIC_SUPABASE_ANON_KEY: 'placeholder-anon-key'
+      PUBLIC_FILES_ROOT: 'https://placeholder.supabase.co'
     steps:
       - uses: actions/checkout@v4
 
