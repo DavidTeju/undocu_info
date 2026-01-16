@@ -4,7 +4,14 @@ import { redirect, fail } from '@sveltejs/kit';
 
 const MAX_RESPONSE_LENGTH = 5000;
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
+	// Check if user is already authenticated
+	let userEmail: string | null = null;
+	if (locals.safeGetSession) {
+		const { user } = await locals.safeGetSession();
+		userEmail = user?.email ?? null;
+	}
+
 	const questions = await prisma.questions
 		.findMany({
 			select: {
@@ -41,12 +48,70 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const questionsCategorized = Object.groupBy(questions, (q) => q.category);
 
-	return { questionsCategorized, collegeName };
+	return { questionsCategorized, collegeName, userEmail };
 };
 
 export const actions = {
-	default: async ({ params, request }) => {
+	sendOtp: async ({ request, locals }) => {
 		const formData = await request.formData();
+		const email = formData.get('email') as string;
+
+		if (!email) {
+			return fail(400, { authError: 'Email is required' });
+		}
+
+		const { error } = await locals.supabase.auth.signInWithOtp({
+			email,
+			options: { shouldCreateUser: true }
+		});
+
+		if (error) {
+			return fail(400, { authError: error.message });
+		}
+
+		return { otpSent: true, email };
+	},
+
+	verifyOtp: async ({ request, locals }) => {
+		const formData = await request.formData();
+		const email = formData.get('email') as string;
+		const otp = formData.get('otp') as string;
+
+		if (!email || !otp) {
+			return fail(400, { authError: 'Email and code are required' });
+		}
+
+		const { data, error } = await locals.supabase.auth.verifyOtp({
+			email,
+			token: otp,
+			type: 'email'
+		});
+
+		if (error) {
+			return fail(400, { authError: error.message, otpSent: true, email });
+		}
+
+		return { verified: true, verifiedEmail: data.user?.email };
+	},
+
+	submit: async ({ params, request, locals }) => {
+		// Verify authentication
+		if (!locals.safeGetSession) {
+			return fail(401, {
+				success: false,
+				reason: 'You must verify your email before submitting suggestions'
+			});
+		}
+		const { user } = await locals.safeGetSession();
+		if (!user?.email) {
+			return fail(401, {
+				success: false,
+				reason: 'You must verify your email before submitting suggestions'
+			});
+		}
+
+		const formData = await request.formData();
+		const remarks = (formData.get('remarks') as string)?.trim() || null;
 
 		const questionsWithOldResponses = await prisma.questions.findMany({
 			select: {
@@ -76,7 +141,7 @@ export const actions = {
 					response
 				};
 			})
-			.filter(({ response, oldResponse }) => response !== null && response !== oldResponse);
+			.filter(({ response, oldResponse }) => (response || '') !== (oldResponse || ''));
 
 		// Validate response lengths
 		const tooLong = questionswithSuggestions.find(
@@ -103,8 +168,10 @@ export const actions = {
 
 		await prisma.suggestions.create({
 			data: {
-				content: JSON.stringify(suggestionsAsObject),
-				college_domain: params.college_domain
+				content: suggestionsAsObject,
+				college_domain: params.college_domain,
+				submitter_email: user.email,
+				remarks
 			}
 		});
 

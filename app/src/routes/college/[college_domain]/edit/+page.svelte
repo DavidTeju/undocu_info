@@ -1,14 +1,28 @@
 <script lang="ts">
 	import question_categories from '$lib/question_categories.json';
 	import Error from '$lib/components/Error.svelte';
-	import type { Session } from '@supabase/supabase-js';
-	import { supabase } from '$lib/supabaseClientPublic';
+	import { enhance } from '$app/forms';
 	import { validEmailRegex } from '$lib/utils';
 
 	const MAX_RESPONSE_LENGTH = 5000;
 
 	let { data, form } = $props();
-	const { questionsCategorized, collegeName } = data;
+	const { questionsCategorized, collegeName, userEmail } = data;
+
+	// Auth state from form responses
+	$effect(() => {
+		if (form?.otpSent) {
+			otpSent = true;
+			if (form.email) email = form.email;
+		}
+		if (form?.verified && form.verifiedEmail) {
+			verifiedEmail = form.verifiedEmail;
+			otpSent = false;
+		}
+		if (form?.authError) {
+			authError = form.authError;
+		}
+	});
 
 	// Track character counts for each textarea
 	let charCounts: Record<string, number> = $state({});
@@ -45,6 +59,7 @@
 	// Confirmation modal state
 	let showConfirmModal = $state(false);
 	let formElement: HTMLFormElement;
+	let remarks = $state('');
 
 	// Build a map of question id -> question text for easy lookup
 	const questionMap: Record<string, string> = {};
@@ -65,6 +80,7 @@
 		oldValue: string | null;
 		newValue: string;
 		isNew: boolean;
+		isDelete: boolean;
 	};
 
 	function getChanges(): Change[] {
@@ -74,14 +90,22 @@
 			const trimmedNew = newValue.trim();
 			const trimmedOld = oldValue?.trim() ?? '';
 
-			if (trimmedNew !== trimmedOld && trimmedNew.length > 0) {
-				changes.push({
-					fieldId,
-					question: questionMap[fieldId] ?? 'Unknown question',
-					oldValue: oldValue || null,
-					newValue: trimmedNew,
-					isNew: !oldValue || oldValue.trim().length === 0
-				});
+			// Include if there's a real change: new content, modified content, or deletion
+			if (trimmedNew !== trimmedOld) {
+				const isDelete = trimmedOld.length > 0 && trimmedNew.length === 0;
+				const isNew = trimmedOld.length === 0 && trimmedNew.length > 0;
+
+				// Only include if it's a meaningful change (not empty -> empty)
+				if (trimmedNew.length > 0 || isDelete) {
+					changes.push({
+						fieldId,
+						question: questionMap[fieldId] ?? 'Unknown question',
+						oldValue: oldValue || null,
+						newValue: trimmedNew,
+						isNew,
+						isDelete
+					});
+				}
 			}
 		}
 		return changes;
@@ -107,7 +131,7 @@
 		expandedFields[fieldId] = !expandedFields[fieldId];
 	}
 
-	// Auth state
+	// Auth state - check if already authenticated from server
 	let email = $state('');
 	let otp = $state('');
 	let otpSent = $state(false);
@@ -116,38 +140,9 @@
 
 	let isValidEmail = $derived(validEmailRegex.test(email));
 
-	let session: Session | null = $state(null);
-	let isVerified = $derived(session !== null);
-
-	const sendOtp = async () => {
-		authError = '';
-		authLoading = true;
-		const { error } = await supabase.auth.signInWithOtp({
-			email,
-			options: {
-				shouldCreateUser: true
-			}
-		});
-		authLoading = false;
-		if (error) {
-			authError = error.message;
-		} else {
-			otpSent = true;
-		}
-	};
-
-	const verifyOtp = async () => {
-		authError = '';
-		authLoading = true;
-		const { data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' });
-		authLoading = false;
-		if (error) {
-			authError = error.message;
-		} else {
-			session = data?.session ?? null;
-			otpSent = false;
-		}
-	};
+	// Track verified email - either from server (existing session) or from OTP verification
+	let verifiedEmail: string | null = $state(userEmail);
+	let isVerified = $derived(verifiedEmail !== null);
 
 	const resetAuth = () => {
 		otpSent = false;
@@ -162,7 +157,20 @@
 		<p class="college-name">{collegeName}</p>
 	</div>
 
-	{#if !isVerified}
+	{#if isVerified}
+		<div class="auth-section verified">
+			<p class="auth-verified">
+				Verified as <strong>{verifiedEmail}</strong>
+			</p>
+			<button
+				type="button"
+				class="auth-btn secondary small"
+				onclick={() => { verifiedEmail = null; }}
+			>
+				Use different email
+			</button>
+		</div>
+	{:else}
 		<div class="auth-section">
 			<p class="auth-intro">
 				To suggest edits, please verify your email address. This helps us maintain data quality. If
@@ -174,7 +182,19 @@
 			{/if}
 
 			{#if !otpSent}
-				<div class="auth-form">
+				<form
+					method="POST"
+					action="?/sendOtp"
+					class="auth-form"
+					use:enhance={() => {
+						authLoading = true;
+						authError = '';
+						return async ({ update }) => {
+							authLoading = false;
+							await update();
+						};
+					}}
+				>
 					<label for="email">Email Address</label>
 					<input
 						bind:value={email}
@@ -183,20 +203,31 @@
 						name="email"
 						placeholder="your@email.com"
 						disabled={authLoading}
-						onkeydown={(e) => e.key === 'Enter' && isValidEmail && !authLoading && sendOtp()}
 					/>
 					<button
-						type="button"
+						type="submit"
 						class="auth-btn"
 						disabled={!isValidEmail || authLoading}
-						onclick={sendOtp}
 					>
 						{authLoading ? 'Sending...' : 'Send verification code'}
 					</button>
-				</div>
+				</form>
 			{:else}
-				<div class="auth-form">
+				<form
+					method="POST"
+					action="?/verifyOtp"
+					class="auth-form"
+					use:enhance={() => {
+						authLoading = true;
+						authError = '';
+						return async ({ update }) => {
+							authLoading = false;
+							await update();
+						};
+					}}
+				>
 					<p class="otp-sent-msg">We sent a 6-digit code to <strong>{email}</strong></p>
+					<input type="hidden" name="email" value={email} />
 					<label for="otp">Verification Code</label>
 					<input
 						bind:value={otp}
@@ -206,7 +237,6 @@
 						placeholder="000000"
 						maxlength="6"
 						disabled={authLoading}
-						onkeydown={(e) => e.key === 'Enter' && otp.length === 6 && !authLoading && verifyOtp()}
 					/>
 					<div class="auth-actions">
 						<button
@@ -218,15 +248,14 @@
 							Change email
 						</button>
 						<button
-							type="button"
+							type="submit"
 							class="auth-btn"
 							disabled={otp.length !== 6 || authLoading}
-							onclick={verifyOtp}
 						>
 							{authLoading ? 'Verifying...' : 'Verify'}
 						</button>
 					</div>
-				</div>
+				</form>
 			{/if}
 		</div>
 	{/if}
@@ -235,7 +264,22 @@
 		<Error message={form.reason} />
 	{/if}
 
-	<form method="post" bind:this={formElement}>
+	<form method="post" action="?/submit" bind:this={formElement}>
+		<input type="hidden" name="remarks" value={remarks} />
+
+		<section class="notes-section" class:disabled={!isVerified}>
+			<h2>Notes</h2>
+			<p class="notes-description">
+				Have a comment, question, or want to report an issue? Add it here.
+			</p>
+			<textarea
+				bind:value={remarks}
+				placeholder="Optional: 'This link is broken', 'Information seems outdated', etc."
+				rows="2"
+				disabled={!isVerified}
+			></textarea>
+		</section>
+
 		{#each Object.entries(question_categories) as [category, categoryText]}
 			<section class="category" class:disabled={!isVerified}>
 				<h2>{categoryText}</h2>
@@ -360,9 +404,14 @@
 					</div>
 				{:else}
 					{#each changes as change}
-						<div class="change-card">
+						<div class="change-card" class:delete-card={change.isDelete}>
 							<h3 class="change-question">{change.question}</h3>
-							{#if change.isNew}
+							{#if change.isDelete}
+								<div class="change-delete">
+									<span class="change-label delete">Delete</span>
+									<p class="change-value deleted">{change.oldValue}</p>
+								</div>
+							{:else if change.isNew}
 								<div class="change-new">
 									<span class="change-label new">New</span>
 									<p class="change-value">{change.newValue}</p>
@@ -434,6 +483,22 @@
 		background-color: rgba(255, 255, 255, 0.9);
 		border-radius: 0.75rem;
 		border: 1px solid rgba(39, 40, 56, 0.15);
+
+		&.verified {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			padding: 1rem 1.5rem;
+			background-color: rgba(50, 150, 80, 0.08);
+			border-color: rgba(50, 150, 80, 0.25);
+		}
+	}
+
+	.auth-verified {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #207040;
 	}
 
 	.auth-intro {
@@ -537,6 +602,12 @@
 			&:hover:not(:disabled) {
 				background-color: rgba(39, 40, 56, 0.05);
 			}
+		}
+
+		&.small {
+			flex: none;
+			padding: 0.5rem 0.75rem;
+			font-size: 0.8rem;
 		}
 	}
 
@@ -889,6 +960,21 @@
 			background-color: rgba(50, 150, 80, 0.15);
 			color: #207040;
 		}
+
+		&.delete {
+			background-color: rgba(200, 50, 50, 0.15);
+			color: #a03030;
+		}
+	}
+
+	.change-card.delete-card {
+		border-color: rgba(200, 50, 50, 0.3);
+		background-color: rgba(200, 50, 50, 0.05);
+	}
+
+	.change-value.deleted {
+		text-decoration: line-through;
+		color: #a03030;
 	}
 
 	.change-value {
@@ -907,15 +993,67 @@
 		align-items: start;
 	}
 
-	.change-old,
+	.change-old {
+		min-width: 0;
+		padding-right: 0.25rem;
+	}
+
 	.change-new {
 		min-width: 0;
+		padding-right: 1rem;
 	}
 
 	.change-arrow {
 		color: #888;
 		font-size: 1.25rem;
 		padding-top: 1.5rem;
+	}
+
+	.notes-section {
+		background-color: rgba(255, 255, 255, 0.7);
+		border-radius: 0.75rem;
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+
+		h2 {
+			margin: 0 0 0.5rem 0;
+			font-size: 1.1rem;
+		}
+
+		.notes-description {
+			margin: 0 0 0.75rem 0;
+			font-size: 0.85rem;
+			color: #666;
+		}
+
+		textarea {
+			width: 100%;
+			padding: 0.75rem;
+			border: 1px solid rgba(39, 40, 56, 0.15);
+			border-radius: 0.5rem;
+			font-size: 0.9rem;
+			font-family: inherit;
+			resize: vertical;
+			background-color: rgba(255, 255, 255, 0.8);
+
+			&:focus {
+				outline: none;
+				border-color: #272838;
+			}
+
+			&::placeholder {
+				color: #999;
+			}
+
+			&:disabled {
+				background-color: rgba(0, 0, 0, 0.03);
+				cursor: not-allowed;
+			}
+		}
+
+		&.disabled {
+			opacity: 0.6;
+		}
 	}
 
 	.modal-footer {
