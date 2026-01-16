@@ -2,13 +2,19 @@ FROM node:24-slim
 LABEL authors="David Tejuosho"
 WORKDIR /usr/local/app
 
+# Install OpenSSL for Prisma (required on slim images)
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
-RUN npm install        
+RUN npm install
 COPY . .
+
+# Set default env vars for build (override at runtime)
 ENV PORT=4173
+
 RUN npx prisma generate
 RUN npm run build
 
 EXPOSE 4173
 
-CMD ["node","-r", "dotenv/config", "build"]
+CMD ["node", "-r", "dotenv/config", "build"]
