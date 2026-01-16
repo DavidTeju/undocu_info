@@ -59,7 +59,13 @@
 					<p>{college?.city}, {college.state}</p>
 				{/if}
 				<a href="https://{domain}.edu">https://{domain}.edu</a>
-				<!--				<a href="/college/{domain}/edit" target="_blank">Suggest edit</a>-->
+				<a href="/college/{domain}/edit" class="suggest-edit">
+					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 20h9"/>
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+					</svg>
+					Suggest an edit
+				</a>
 			</div>
 
 			{#each Object.entries(college.responses) as [category, responses]}
@@ -150,13 +156,41 @@
 		flex-direction: column;
 		justify-content: space-between;
 		align-items: start;
-
-		:last-child {
-			margin-left: auto;
-		}
+		gap: 0.25rem;
 
 		p {
 			margin: 0;
+		}
+	}
+
+	.suggest-edit {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: #6b5b4f;
+		background-color: #f5ebe4;
+		border: 1px solid #0000000f;
+		padding: 0.35rem 0.75rem;
+		border-radius: 999px;
+		text-decoration: none;
+		transition: all 0.15s ease;
+		margin-top: 0.5rem;
+
+		svg {
+			flex-shrink: 0;
+			opacity: 0.7;
+		}
+
+		&:hover {
+			background-color: #efe3d9;
+			border-color: #00000018;
+			color: #4a3f36;
+
+			svg {
+				opacity: 1;
+			}
 		}
 	}
 </style>
