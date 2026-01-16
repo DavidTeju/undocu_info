@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData, ActionData } from './$types';
+	import { enhance } from '$app/forms';
 
 	interface Props {
 		data: PageData;
@@ -103,11 +104,11 @@
 					{/if}
 
 					<footer class="suggestion-actions">
-						<form method="POST" action="?/reject">
+						<form method="POST" action="?/reject" use:enhance>
 							<input type="hidden" name="suggestionId" value={suggestion.id} />
 							<button type="submit" class="btn reject">Reject</button>
 						</form>
-						<form method="POST" action="?/approve">
+						<form method="POST" action="?/approve" use:enhance>
 							<input type="hidden" name="suggestionId" value={suggestion.id} />
 							<button type="submit" class="btn approve">Approve</button>
 						</form>
