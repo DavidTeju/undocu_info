@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { type Handle, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import crypto from 'crypto';
 
 // Check if the path needs Supabase auth
 function needsSupabase(pathname: string): boolean {
@@ -8,6 +9,9 @@ function needsSupabase(pathname: string): boolean {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+	const start = Date.now();
+	const requestId = crypto.randomUUID();
+
 	const SUPABASE_URL = env.SUPABASE_URL;
 	const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY;
 
@@ -65,9 +69,25 @@ export const handle: Handle = async ({ event, resolve }) => {
 		// Edit routes don't redirect - auth is checked in the action
 	}
 
-	return resolve(event, {
+	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range' || name === 'x-supabase-api-version';
 		}
 	});
+
+	// Log request after response resolves
+	const duration = Date.now() - start;
+	console.log(
+		JSON.stringify({
+			timestamp: new Date().toISOString(),
+			requestId,
+			method: event.request.method,
+			path: event.url.pathname,
+			status: response.status,
+			duration,
+			userAgent: event.request.headers.get('user-agent')?.slice(0, 100)
+		})
+	);
+
+	return response;
 };
