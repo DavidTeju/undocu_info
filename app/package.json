@@ -6,11 +6,17 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"test": "vitest",
+		"test:run": "vitest run",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"prepare": "cd .. && git config core.hooksPath .husky"
+		"prepare": "cd .. && git config core.hooksPath .husky",
+		"email:queue": "tsx scripts/email-outreach.ts queue",
+		"email:send": "tsx scripts/email-outreach.ts send",
+		"email:status": "tsx scripts/email-outreach.ts status",
+		"email:logs": "tsx scripts/email-outreach.ts logs"
 	},
 	"lint-staged": {
 		"*.{js,ts,svelte}": [
@@ -40,9 +46,11 @@
 		"prisma": "^6.3.1",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
+		"tsx": "^4.21.0",
 		"typescript": "^5.5.0",
 		"typescript-eslint": "^8.0.0",
-		"vite": "^5.4.4"
+		"vite": "^5.4.4",
+		"vitest": "^4.0.18"
 	},
 	"type": "module",
 	"dependencies": {
@@ -55,6 +63,7 @@
 		"dotenv": "^16.4.7",
 		"lodash-es": "^4.17.21",
 		"normalize.css": "^8.0.1",
+		"resend": "^6.8.0",
 		"sass": "^1.83.4",
 		"tailwindcss": "^4.0.0"
 	}
