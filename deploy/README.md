@@ -21,8 +21,10 @@ VPS (82.29.152.139)
 │   ├── db_YYYYMMDD_HHMMSS.sql.gz
 │   └── storage_YYYYMMDD_HHMMSS.tar.gz
 │
-└── nginx                           # Reverse proxy
-    └── sites-enabled/
+└── /etc/nginx/                     # Reverse proxy (git tracked)
+    ├── conf.d/geoip-blocking.conf  # GeoIP country blocking
+    ├── snippets/geoip-block.conf   # Blocking rule snippet
+    └── sites-available/undocustudent  # All domains:
         ├── undocustudent.org       # Main app (:4173)
         ├── files.undocustudent.org # API + storage (:8000)
         ├── studio.undocustudent.org # Supabase Studio (:3001)
@@ -61,13 +63,16 @@ Note: External connections use Supavisor pooler (port 6543) with tenant format u
 
 The official Supabase docker-compose.yml has these modifications:
 
-### 1. Email Templates (auth service)
+### 1. Email Templates & Subjects (auth service)
 ```yaml
 environment:
+  # Template URLs (hosted via nginx)
   GOTRUE_MAILER_TEMPLATES_MAGIC_LINK: ${GOTRUE_MAILER_TEMPLATES_MAGIC_LINK}
   GOTRUE_MAILER_TEMPLATES_RECOVERY: ${GOTRUE_MAILER_TEMPLATES_RECOVERY}
   GOTRUE_MAILER_TEMPLATES_INVITE: ${GOTRUE_MAILER_TEMPLATES_INVITE}
   GOTRUE_MAILER_TEMPLATES_CONFIRMATION: ${GOTRUE_MAILER_TEMPLATES_CONFIRMATION}
+  # Email subjects
+  GOTRUE_MAILER_SUBJECTS_MAGIC_LINK: ${GOTRUE_MAILER_SUBJECTS_MAGIC_LINK}
 ```
 
 ### 2. imgproxy Resolution Limit
@@ -109,8 +114,9 @@ Frontend analytics at https://analytics.undocustudent.org
 - Tracking script in `app/src/app.html`
 - Dashboard: https://analytics.undocustudent.org (login required)
 
-## Email Templates
+## Email Configuration
 
+### Templates
 Templates are served via nginx from `/var/www/email-templates/`:
 - `magiclink.html` - OTP verification emails
 
@@ -119,6 +125,25 @@ Template URL: `https://undocustudent.org/email-templates/magiclink.html`
 When updating templates:
 1. Edit the template in this repo (`deploy/templates/`)
 2. Copy to VPS: `scp deploy/templates/* root@82.29.152.139:/var/www/email-templates/`
+
+### Email Subjects
+Email subjects are configured via environment variables in `/root/supabase-docker/.env` on the VPS:
+```env
+GOTRUE_MAILER_SUBJECTS_MAGIC_LINK=Your Verification Code
+GOTRUE_MAILER_SUBJECTS_RECOVERY=Reset Your Password
+GOTRUE_MAILER_SUBJECTS_INVITE=You have been invited
+GOTRUE_MAILER_SUBJECTS_CONFIRMATION=Confirm Your Email
+```
+
+These must also be passed to the auth service in `docker-compose.yml`:
+```yaml
+GOTRUE_MAILER_SUBJECTS_MAGIC_LINK: ${GOTRUE_MAILER_SUBJECTS_MAGIC_LINK}
+```
+
+After changing subjects, restart the auth service:
+```bash
+cd /root/supabase-docker && docker compose restart auth
+```
 
 ## Backups
 
@@ -135,6 +160,61 @@ Backup script (`/root/supabase-docker/backup.sh`):
 Manual backup:
 ```bash
 ssh root@82.29.152.139 '/root/supabase-docker/backup.sh'
+```
+
+## Request Logging
+
+All HTTP requests are logged to stdout in structured JSON format for debugging and auditing.
+
+### Log Format
+```json
+{
+  "timestamp": "2026-01-25T12:34:56.789Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "method": "GET",
+  "path": "/college/stanford.edu",
+  "status": 200,
+  "duration": 45,
+  "userAgent": "Mozilla/5.0..."
+}
+```
+
+### Fields
+| Field | Description |
+|-------|-------------|
+| timestamp | ISO 8601 timestamp |
+| requestId | UUID for correlating logs |
+| method | HTTP method (GET, POST, etc.) |
+| path | URL pathname |
+| status | HTTP response status code |
+| duration | Request duration in milliseconds |
+| userAgent | First 100 chars of User-Agent header |
+
+### Viewing Logs
+
+**In development:**
+```bash
+npm run dev
+# Logs appear in terminal
+```
+
+**In production (Docker):**
+```bash
+docker logs -f undocu-app
+# Or pipe to a logging service
+docker logs undocu-app 2>&1 | your-log-shipper
+```
+
+**Filtering JSON logs:**
+```bash
+# Get all 500 errors
+docker logs undocu-app 2>&1 | jq 'select(.status >= 500)'
+
+# Get slow requests (>1s)
+docker logs undocu-app 2>&1 | jq 'select(.duration > 1000)'
+
+# Get requests to specific path
+docker logs undocu-app 2>&1 | jq 'select(.path | startswith("/admin"))'
 ```
 
 ## Common Operations
@@ -183,9 +263,46 @@ For ANON_KEY and SERVICE_ROLE_KEY, use the Supabase JWT generator or create manu
 
 ## Nginx Configuration
 
+Nginx configs are version controlled directly on the VPS:
+```bash
+cd /etc/nginx && git log --oneline
+```
+
 Files subdomain serves:
 - `/` → Kong API gateway (port 8000)
 
 Main domain serves:
 - `/email-templates/` → Static email templates (nginx)
 - `/` → App container (port 4173)
+
+### GeoIP Country Blocking
+
+Traffic from certain countries is blocked at the nginx level using MaxMind's GeoLite2 database.
+
+**Currently blocked:** Singapore (SG)
+
+**Key files:**
+- `/etc/nginx/conf.d/geoip-blocking.conf` - GeoIP2 database config and country map
+- `/etc/nginx/snippets/geoip-block.conf` - Blocking rule (included in each site)
+- `/etc/GeoIP.conf` - MaxMind credentials (account 1288100)
+- `/usr/share/GeoIP/GeoLite2-Country.mmdb` - The database file
+
+**To block/unblock countries:**
+```bash
+# Edit the country map
+vim /etc/nginx/conf.d/geoip-blocking.conf
+
+# Add country codes to block (1 = blocked, 0 = allowed)
+# Example: CN 1;  # China
+
+# Test and reload
+nginx -t && systemctl reload nginx
+
+# Commit the change
+cd /etc/nginx && git add -A && git commit -m "Block/unblock country X"
+```
+
+**Database updates:** The GeoIP database auto-updates weekly via `geoipupdate.timer`. Manual update:
+```bash
+geoipupdate -v
+```

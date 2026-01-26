@@ -82,60 +82,70 @@ export const actions = {
 			return fail(400, { error: 'Missing suggestion ID' });
 		}
 
-		const suggestion = await prisma.suggestions.findUnique({
-			where: { id: BigInt(suggestionId) },
-			include: { colleges: true }
-		});
+		// Wrap entire approval in a transaction for atomicity
+		try {
+			await prisma.$transaction(async (tx) => {
+				const suggestion = await tx.suggestions.findUnique({
+					where: { id: BigInt(suggestionId) },
+					include: { colleges: true }
+				});
 
-		if (!suggestion) {
-			return fail(404, { error: 'Suggestion not found' });
-		}
-
-		const content = suggestion.content as Record<
-			string,
-			{ id: number; question: string; oldResponse: string | null; response: string }
-		>;
-
-		// Apply each change to the responses table
-		for (const [questionId, change] of Object.entries(content)) {
-			const existingResponse = await prisma.responses.findFirst({
-				where: {
-					questionid: parseInt(questionId),
-					collegeid: suggestion.colleges.id
+				if (!suggestion) {
+					throw new Error('Suggestion not found');
 				}
-			});
 
-			if (existingResponse && !change.response) {
-				// Delete existing response
-				await prisma.responses.delete({
-					where: { id: existingResponse.id }
-				});
-			} else if (existingResponse) {
-				// Update existing response
-				await prisma.responses.update({
-					where: { id: existingResponse.id },
-					data: { response: change.response }
-				});
-			} else if (change.response) {
-				// Create new response
-				await prisma.responses.create({
+				const content = suggestion.content as Record<
+					string,
+					{ id: number; question: string; oldResponse: string | null; response: string }
+				>;
+
+				// Apply each change to the responses table
+				for (const [questionId, change] of Object.entries(content)) {
+					const existingResponse = await tx.responses.findFirst({
+						where: {
+							questionid: parseInt(questionId),
+							collegeid: suggestion.colleges.id
+						}
+					});
+
+					if (existingResponse && !change.response) {
+						// Delete existing response
+						await tx.responses.delete({
+							where: { id: existingResponse.id }
+						});
+					} else if (existingResponse) {
+						// Update existing response
+						await tx.responses.update({
+							where: { id: existingResponse.id },
+							data: { response: change.response }
+						});
+					} else if (change.response) {
+						// Create new response
+						await tx.responses.create({
+							data: {
+								questionid: parseInt(questionId),
+								collegeid: suggestion.colleges.id,
+								response: change.response
+							}
+						});
+					}
+				}
+
+				// Mark suggestion as approved
+				await tx.suggestions.update({
+					where: { id: BigInt(suggestionId) },
 					data: {
-						questionid: parseInt(questionId),
-						collegeid: suggestion.colleges.id,
-						response: change.response
+						status: 'approved',
+						reviewed_at: new Date()
 					}
 				});
+			});
+		} catch (error) {
+			if (error instanceof Error && error.message === 'Suggestion not found') {
+				return fail(404, { error: 'Suggestion not found' });
 			}
+			throw error;
 		}
-
-		// Mark suggestion as approved
-		await prisma.suggestions.update({
-			where: { id: BigInt(suggestionId) },
-			data: {
-				status: 'approved',
-				reviewed_at: new Date()
-			}
-		});
 
 		return { success: true, action: 'approved' };
 	},
