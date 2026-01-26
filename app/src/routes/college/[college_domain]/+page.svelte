@@ -32,29 +32,33 @@
 		const preserved: string[] = [];
 
 		// Step 1: Extract and validate existing anchor tags
-		let processed = text.replace(
-			/<a\s+[^>]*href\s*=\s*["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi,
-			(match, href, content) => {
-				if (isSafeHref(href)) {
-					// Allow safe inline tags inside anchors, escape everything else
-					const inlineTags: string[] = [];
-					const safeContent = content
-						.replace(/<(\/?)(b|i|strong|em|u)>/gi, (_: string, slash: string, tag: string) => {
-							inlineTags.push(`<${slash}${tag}>`);
-							return `\x01IT${inlineTags.length - 1}\x01`;
-						})
-						.replace(/<[^>]*>/g, (tag: string) => escapeHtml(tag))
-						.replace(/\x01IT(\d+)\x01/g, (_: string, i: string) => inlineTags[parseInt(i)]);
-					const safeHref = escapeHtml(href);
-					preserved.push(
-						`<a href="${safeHref}" target="_blank" rel="noopener noreferrer">${safeContent}</a>`
-					);
-				} else {
-					preserved.push(escapeHtml(match));
-				}
-				return `\x00P${preserved.length - 1}\x00`;
-			}
+		// Include curly quotes ("" '') which sometimes appear in user-submitted content
+		// Using Unicode escapes: \u201C (") \u201D (") \u2018 (') \u2019 (')
+		const quoteChars = `"'\\u201C\\u201D\\u2018\\u2019`;
+		const anchorRegex = new RegExp(
+			`<a\\s+[^>]*href\\s*=\\s*[${quoteChars}]([^${quoteChars}]*)[${quoteChars}][^>]*>([\\s\\S]*?)<\\/a>`,
+			'gi'
 		);
+		let processed = text.replace(anchorRegex, (match, href, content) => {
+			if (isSafeHref(href)) {
+				// Allow safe inline tags inside anchors, escape everything else
+				const inlineTags: string[] = [];
+				const safeContent = content
+					.replace(/<(\/?)(b|i|strong|em|u)>/gi, (_: string, slash: string, tag: string) => {
+						inlineTags.push(`<${slash}${tag}>`);
+						return `\x01IT${inlineTags.length - 1}\x01`;
+					})
+					.replace(/<[^>]*>/g, (tag: string) => escapeHtml(tag))
+					.replace(/\x01IT(\d+)\x01/g, (_: string, i: string) => inlineTags[parseInt(i)]);
+				const safeHref = escapeHtml(href);
+				preserved.push(
+					`<a href="${safeHref}" target="_blank" rel="noopener noreferrer">${safeContent}</a>`
+				);
+			} else {
+				preserved.push(escapeHtml(match));
+			}
+			return `\x00P${preserved.length - 1}\x00`;
+		});
 
 		// Step 2: Preserve safe standalone tags (p, br)
 		processed = processed.replace(/<(\/?)(p|br)\s*\/?>/gi, (match) => {
