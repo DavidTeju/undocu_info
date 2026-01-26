@@ -10,6 +10,7 @@ export const load: PageServerLoad = async () => {
 		include: {
 			colleges: {
 				select: {
+					id: true,
 					name: true
 				}
 			}
@@ -18,6 +19,40 @@ export const load: PageServerLoad = async () => {
 			created_at: 'asc'
 		}
 	});
+
+	// Collect all question IDs and college IDs from suggestions
+	const allQuestionIds = new Set<number>();
+	const collegeIdToDomain = new Map<number, string>();
+
+	for (const s of suggestions) {
+		const content = s.content as Record<string, { id: number }>;
+		for (const questionId of Object.keys(content)) {
+			allQuestionIds.add(parseInt(questionId));
+		}
+		collegeIdToDomain.set(s.colleges.id, s.college_domain);
+	}
+
+	// Batch fetch current responses for all relevant colleges and questions
+	const currentResponses = await prisma.responses.findMany({
+		where: {
+			questionid: { in: Array.from(allQuestionIds) },
+			collegeid: { in: Array.from(collegeIdToDomain.keys()) }
+		},
+		select: {
+			questionid: true,
+			response: true,
+			collegeid: true
+		}
+	});
+
+	// Create lookup map: `${college_domain}-${questionId}` → response
+	const currentResponseMap: Record<string, string> = {};
+	for (const r of currentResponses) {
+		const domain = collegeIdToDomain.get(r.collegeid);
+		if (domain) {
+			currentResponseMap[`${domain}-${r.questionid}`] = r.response;
+		}
+	}
 
 	// Transform BigInt to string for JSON serialization
 	return {
@@ -33,7 +68,8 @@ export const load: PageServerLoad = async () => {
 			status: s.status,
 			submitter_email: s.submitter_email,
 			remarks: s.remarks
-		}))
+		})),
+		currentResponseMap
 	};
 };
 

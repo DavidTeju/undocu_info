@@ -70,19 +70,64 @@
 					</header>
 
 					<div class="changes">
-						{#each Object.entries(suggestion.content) as [_questionId, change]}
+						{#each Object.entries(suggestion.content) as [questionId, change]}
+							{@const currentValue =
+								data.currentResponseMap[`${suggestion.college_domain}-${questionId}`] ?? null}
+							{@const dataChangedSinceProposal = currentValue !== change.oldResponse}
 							<div class="change-item">
 								<h3 class="question">{change.question}</h3>
-								{#if change.oldResponse && !change.response}
+								{#if currentValue && !change.response}
 									<div class="delete-only">
 										<span class="label">Delete</span>
-										<p>{change.oldResponse}</p>
+										{#if dataChangedSinceProposal}
+											<span class="stale-indicator" data-tooltip="Changed since proposal">
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													><circle cx="12" cy="12" r="10" /><line
+														x1="12"
+														y1="8"
+														x2="12"
+														y2="12"
+													/><line x1="12" y1="16" x2="12.01" y2="16" /></svg
+												>
+											</span>
+										{/if}
+										<p>{currentValue}</p>
 									</div>
-								{:else if change.oldResponse}
+								{:else if currentValue}
 									<div class="diff">
 										<div class="old">
 											<span class="label">Current</span>
-											<p>{change.oldResponse}</p>
+											{#if dataChangedSinceProposal}
+												<span class="stale-indicator" data-tooltip="Changed since proposal">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														><circle cx="12" cy="12" r="10" /><line
+															x1="12"
+															y1="8"
+															x2="12"
+															y2="12"
+														/><line x1="12" y1="16" x2="12.01" y2="16" /></svg
+													>
+												</span>
+											{/if}
+											<p>{currentValue}</p>
 										</div>
 										<div class="arrow">→</div>
 										<div class="new">
@@ -281,8 +326,8 @@
 			padding-right: 0.25rem;
 
 			.label {
-				background-color: rgba(200, 50, 50, 0.15);
-				color: #a03030;
+				background-color: rgba(200, 160, 60, 0.18);
+				color: #8b6914;
 			}
 		}
 
@@ -340,6 +385,44 @@
 			white-space: pre-wrap;
 			text-decoration: line-through;
 			opacity: 0.7;
+		}
+	}
+
+	.stale-indicator {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: 0.4rem;
+		padding: 0.2rem;
+		background-color: rgba(200, 50, 50, 0.15);
+		border-radius: 0.25rem;
+		color: #a03030;
+		cursor: help;
+		vertical-align: middle;
+
+		&::after {
+			content: attr(data-tooltip);
+			position: absolute;
+			bottom: calc(100% + 4px);
+			left: 50%;
+			transform: translateX(-50%);
+			padding: 0.35rem 0.5rem;
+			background: #333;
+			color: #fff;
+			font-size: 0.7rem;
+			font-weight: 400;
+			white-space: nowrap;
+			border-radius: 0.25rem;
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity 0.15s;
+			pointer-events: none;
+		}
+
+		&:hover::after {
+			opacity: 1;
+			visibility: visible;
 		}
 	}
 
