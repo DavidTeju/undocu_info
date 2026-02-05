@@ -149,7 +149,7 @@ cd /root/supabase-docker && docker compose restart auth
 
 Automated daily backups via cron:
 ```bash
-0 3 * * * /root/supabase-docker/backup.sh
+0 3 * * * /root/supabase-docker/backup.sh >> /var/log/supabase-backup.log 2>&1
 ```
 
 Backup script (`/root/supabase-docker/backup.sh`):
