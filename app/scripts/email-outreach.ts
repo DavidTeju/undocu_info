@@ -8,7 +8,7 @@
  * Features:
  * - Queue-based system for Resend's 100 emails/day free tier
  * - Logs all sends for auditing
- * - Handles bounces by removing invalid emails from DB
+ * - Handles bounces by marking queue rows without deleting source email data
  *
  * Usage:
  *   cd app && npx tsx scripts/email-outreach.ts [command]
@@ -190,19 +190,11 @@ async function sendEmails(): Promise<void> {
 			const isBounce = /bounce|invalid|rejected/i.test(errorMessage);
 
 			if (isBounce) {
-				// Atomic: delete the dead address AND mark the queue row bounced
-				// together, so we never have a deleted address with a still-pending
-				// queue row pointing at it.
-				await prisma.$transaction([
-					prisma.emailaddresses.delete({
-						where: { emailaddress: queueItem.email_address }
-					}),
-					prisma.email_outreach_queue.update({
-						where: { id: queueItem.id },
-						data: { status: 'bounced', error_message: errorMessage }
-					})
-				]);
-				console.log(`✗ Bounced: ${queueItem.email_address} (removed from database)`);
+				await prisma.email_outreach_queue.update({
+					where: { id: queueItem.id },
+					data: { status: 'bounced', error_message: errorMessage }
+				});
+				console.log(`✗ Bounced: ${queueItem.email_address} (marked bounced; address retained)`);
 			} else {
 				await prisma.email_outreach_queue.update({
 					where: { id: queueItem.id },
