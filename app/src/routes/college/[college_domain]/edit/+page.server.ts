@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
 import { redirect, fail } from '@sveltejs/kit';
+import { rateLimit } from '$lib/rateLimit';
 
 const MAX_RESPONSE_LENGTH = 5000;
 
@@ -52,12 +53,26 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 };
 
 export const actions = {
-	sendOtp: async ({ request, locals }) => {
+	sendOtp: async ({ request, locals, getClientAddress }) => {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 
 		if (!email) {
 			return fail(400, { authError: 'Email is required' });
+		}
+
+		// Rate limit: 60s cooldown per email, 30s cooldown per IP
+		const emailCheck = rateLimit(`otp:email:${email.toLowerCase()}`, 60_000);
+		if (emailCheck.limited) {
+			return fail(429, {
+				authError: `Please wait ${emailCheck.retryAfter}s before requesting another code`
+			});
+		}
+		const ipCheck = rateLimit(`otp:ip:${getClientAddress()}`, 30_000);
+		if (ipCheck.limited) {
+			return fail(429, {
+				authError: `Too many requests. Please wait ${ipCheck.retryAfter}s`
+			});
 		}
 
 		const { error } = await locals.supabase.auth.signInWithOtp({
