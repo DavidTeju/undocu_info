@@ -68,6 +68,11 @@ jobs:
               --build-arg PUBLIC_SUPABASE_ANON_KEY="$PUBLIC_SUPABASE_ANON_KEY" \
               --build-arg PUBLIC_FILES_ROOT="$PUBLIC_FILES_ROOT" \
               -t undocu_app .
+            docker run --rm \
+              --network supabase_default \
+              --env-file .env \
+              undocu_app \
+              sh -lc 'DIRECT_DATABASE_URL="$DATABASE_URL" npx prisma migrate deploy --schema prisma/schema.prisma'
             docker rm -f undocu_app 2>/dev/null || true
             docker run -d \
               --name undocu_app \

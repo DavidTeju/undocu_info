@@ -49,6 +49,14 @@
 			<span class="stat-value">{data.stats.bounced}</span>
 			<span class="stat-label">Bounced</span>
 		</div>
+		<div class="stat-card suppressed">
+			<span class="stat-value">{data.stats.suppressed}</span>
+			<span class="stat-label">Suppressed</span>
+		</div>
+		<div class="stat-card complained">
+			<span class="stat-value">{data.stats.complained}</span>
+			<span class="stat-label">Complained</span>
+		</div>
 	</section>
 
 	<section class="logs-section">
@@ -197,6 +205,10 @@
 		&.bounced .stat-value {
 			color: #856404;
 		}
+		&.suppressed .stat-value,
+		&.complained .stat-value {
+			color: #7c2d12;
+		}
 	}
 
 	section {
@@ -308,7 +320,9 @@
 			background: rgba(200, 50, 50, 0.15);
 			color: #a03030;
 		}
-		&.bounced {
+		&.bounced,
+		&.suppressed,
+		&.complained {
 			background: rgba(133, 100, 4, 0.15);
 			color: #856404;
 		}

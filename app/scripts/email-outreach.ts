@@ -8,7 +8,7 @@
  * Features:
  * - Queue-based system for Resend's 100 emails/day free tier
  * - Logs all sends for auditing
- * - Handles bounces by marking queue rows without deleting source email data
+ * - Stores Resend email ids so webhook bounce/suppression events can update queue state
  *
  * Usage:
  *   cd app && npx tsx scripts/email-outreach.ts [command]
@@ -31,7 +31,8 @@ import {
 	getShowcasePool,
 	pickShowcaseForRecipient
 } from './lib/emailRenderers';
-import { getPositiveIntegerEnv, getPrismaDatabaseUrl } from './lib/env';
+import { getPositiveIntegerEnv, getPrismaDatabaseUrl, normalizeEnvValue } from './lib/env';
+import { formatResendSendError } from './lib/resendErrors';
 
 // Load environment variables
 config();
@@ -42,7 +43,11 @@ const prisma = new PrismaClient({
 		db: { url: getPrismaDatabaseUrl() }
 	}
 });
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = normalizeEnvValue(process.env.RESEND_API_KEY);
+if (!resendApiKey) {
+	throw new Error('RESEND_API_KEY must be set');
+}
+const resend = new Resend(resendApiKey);
 
 const DEFAULT_DAILY_LIMIT = 100;
 const DAILY_LIMIT = getPositiveIntegerEnv('EMAIL_DAILY_LIMIT') ?? DEFAULT_DAILY_LIMIT;
@@ -78,16 +83,13 @@ async function queueEmails(): Promise<void> {
 		const emailType = hasResponses ? 'appreciation' : 'outreach';
 
 		for (const emailAddr of college.emailaddresses) {
-			// Skip if already queued, recently sent, or previously bounced.
-			// Including `bounced` prevents re-queuing dead addresses if they ever
-			// reappear in `emailaddresses` (e.g. CSV re-import).
+			// Skip if already queued, recently sent, or suppressed by a Resend webhook.
 			const existing = await prisma.email_outreach_queue.findFirst({
 				where: {
 					college_id: college.id,
 					email_address: emailAddr.emailaddress,
 					OR: [
-						{ status: 'pending' },
-						{ status: 'bounced' },
+						{ status: { in: ['pending', 'failed', 'bounced', 'suppressed', 'complained'] } },
 						{
 							status: 'sent',
 							sent_at: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) }
@@ -96,7 +98,16 @@ async function queueEmails(): Promise<void> {
 				}
 			});
 
-			if (existing) {
+			const suppressed = await prisma.email_outreach_suppression.findUnique({
+				where: {
+					college_id_email_address: {
+						college_id: college.id,
+						email_address: emailAddr.emailaddress
+					}
+				}
+			});
+
+			if (existing || suppressed) {
 				skipped++;
 				continue;
 			}
@@ -120,7 +131,7 @@ async function queueEmails(): Promise<void> {
 
 	console.log(`\nQueued ${queuedOutreach} outreach emails (no responses)`);
 	console.log(`Queued ${queuedAppreciation} appreciation emails (have responses)`);
-	console.log(`Skipped ${skipped} (already queued or sent this year)`);
+	console.log(`Skipped ${skipped} (already queued, sent this year, or webhook-suppressed)`);
 }
 
 /**
@@ -168,46 +179,60 @@ async function sendEmails(): Promise<void> {
 					);
 
 		try {
-			const { error } = await resend.emails.send({
+			const { data, error } = await resend.emails.send({
 				from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
 				to: queueItem.email_address,
 				subject: emailContent.subject,
 				html: emailContent.html
 			});
 
-			if (error) throw new Error(error.message);
+			if (error) {
+				const errorMessage = formatResendSendError(error);
+				await prisma.email_outreach_queue.update({
+					where: { id: queueItem.id },
+					data: { status: 'failed', error_message: errorMessage }
+				});
+				failed++;
+				details.push({
+					email: queueItem.email_address,
+					college: college.name,
+					status: 'failed',
+					error: errorMessage
+				});
+				console.log(`✗ Failed: ${queueItem.email_address} - ${errorMessage}`);
+				continue;
+			}
+
+			if (!data?.id) {
+				throw new Error('Resend send succeeded without an email id');
+			}
 
 			await prisma.email_outreach_queue.update({
 				where: { id: queueItem.id },
-				data: { status: 'sent', sent_at: new Date() }
+				data: {
+					status: 'sent',
+					sent_at: new Date(),
+					resend_email_id: data.id,
+					error_message: null
+				}
 			});
 
 			sent++;
 			details.push({ email: queueItem.email_address, college: college.name, status: 'sent' });
 			console.log(`✓ Sent to ${queueItem.email_address} (${college.name})`);
 		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			const isBounce = /bounce|invalid|rejected/i.test(errorMessage);
-
-			if (isBounce) {
-				await prisma.email_outreach_queue.update({
-					where: { id: queueItem.id },
-					data: { status: 'bounced', error_message: errorMessage }
-				});
-				console.log(`✗ Bounced: ${queueItem.email_address} (marked bounced; address retained)`);
-			} else {
-				await prisma.email_outreach_queue.update({
-					where: { id: queueItem.id },
-					data: { status: 'failed', error_message: errorMessage }
-				});
-				console.log(`✗ Failed: ${queueItem.email_address} - ${errorMessage}`);
-			}
+			const errorMessage = formatResendSendError(err);
+			await prisma.email_outreach_queue.update({
+				where: { id: queueItem.id },
+				data: { status: 'failed', error_message: errorMessage }
+			});
+			console.log(`✗ Failed: ${queueItem.email_address} - ${errorMessage}`);
 
 			failed++;
 			details.push({
 				email: queueItem.email_address,
 				college: college.name,
-				status: isBounce ? 'bounced' : 'failed',
+				status: 'failed',
 				error: errorMessage
 			});
 		}
@@ -243,6 +268,8 @@ async function showStatus(): Promise<void> {
 	const sent = await prisma.email_outreach_queue.count({ where: { status: 'sent' } });
 	const failed = await prisma.email_outreach_queue.count({ where: { status: 'failed' } });
 	const bounced = await prisma.email_outreach_queue.count({ where: { status: 'bounced' } });
+	const suppressed = await prisma.email_outreach_queue.count({ where: { status: 'suppressed' } });
+	const complained = await prisma.email_outreach_queue.count({ where: { status: 'complained' } });
 
 	const pendingByType = await prisma.email_outreach_queue.groupBy({
 		by: ['email_type'],
@@ -256,6 +283,8 @@ async function showStatus(): Promise<void> {
 	console.log(`Sent: ${sent}`);
 	console.log(`Failed: ${failed}`);
 	console.log(`Bounced: ${bounced}`);
+	console.log(`Suppressed: ${suppressed}`);
+	console.log(`Complained: ${complained}`);
 	console.log(`\nDays to complete queue: ${Math.ceil(pending / DAILY_LIMIT)}`);
 }
 

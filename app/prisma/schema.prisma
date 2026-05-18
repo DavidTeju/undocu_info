@@ -9,16 +9,17 @@ datasource db {
 }
 
 model colleges {
-  id                   Int                    @id @default(autoincrement())
-  name                 String                 @unique
-  domain               String                 @unique
-  city                 String?
-  state                String?
-  hidden               Boolean?               @default(false)
-  Suggestions          Suggestions[]
-  email_outreach_queue email_outreach_queue[]
-  emailaddresses       emailaddresses[]
-  responses            responses[]
+  id                         Int                          @id @default(autoincrement())
+  name                       String                       @unique
+  domain                     String                       @unique
+  city                       String?
+  state                      String?
+  hidden                     Boolean?                     @default(false)
+  Suggestions                Suggestions[]
+  email_outreach_queue       email_outreach_queue[]
+  email_outreach_suppression email_outreach_suppression[]
+  emailaddresses             emailaddresses[]
+  responses                  responses[]
 }
 
 model emailaddresses {
@@ -62,19 +63,39 @@ model Suggestions {
 
 /// Email outreach queue for tracking which emails need to be sent
 model email_outreach_queue {
-  id            BigInt    @id @default(autoincrement())
-  created_at    DateTime  @default(now()) @db.Timestamptz(6)
-  college_id    Int
-  email_address String
-  email_type    String
-  status        String    @default("pending")
-  scheduled_for DateTime? @db.Timestamptz(6)
-  sent_at       DateTime? @db.Timestamptz(6)
-  error_message String?
-  colleges      colleges  @relation(fields: [college_id], references: [id], onDelete: Cascade)
+  id              BigInt    @id @default(autoincrement())
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  college_id      Int
+  email_address   String
+  email_type      String
+  status          String    @default("pending")
+  scheduled_for   DateTime? @db.Timestamptz(6)
+  sent_at         DateTime? @db.Timestamptz(6)
+  resend_email_id String?   @unique
+  error_message   String?
+  colleges        colleges  @relation(fields: [college_id], references: [id], onDelete: Cascade)
 
   @@index([status, scheduled_for])
   @@index([college_id])
+  @@index([college_id, email_address])
+}
+
+/// Durable suppression state populated only from Resend webhook events.
+model email_outreach_suppression {
+  id                BigInt   @id @default(autoincrement())
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime @updatedAt @db.Timestamptz(6)
+  college_id        Int
+  email_address     String
+  reason            String
+  source_event_type String
+  resend_email_id   String?
+  details           Json?    @db.Json
+  colleges          colleges @relation(fields: [college_id], references: [id], onDelete: Cascade)
+
+  @@unique([college_id, email_address])
+  @@index([email_address])
+  @@index([resend_email_id])
 }
 
 /// Log of all email outreach runs for auditing and viewing results

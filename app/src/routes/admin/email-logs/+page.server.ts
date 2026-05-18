@@ -8,7 +8,9 @@ export const load: PageServerLoad = async () => {
 			prisma.email_outreach_queue.count({ where: { status: 'pending' } }),
 			prisma.email_outreach_queue.count({ where: { status: 'sent' } }),
 			prisma.email_outreach_queue.count({ where: { status: 'failed' } }),
-			prisma.email_outreach_queue.count({ where: { status: 'bounced' } })
+			prisma.email_outreach_queue.count({ where: { status: 'bounced' } }),
+			prisma.email_outreach_queue.count({ where: { status: 'suppressed' } }),
+			prisma.email_outreach_queue.count({ where: { status: 'complained' } })
 		]),
 
 		// Recent run logs
@@ -20,7 +22,7 @@ export const load: PageServerLoad = async () => {
 		// Recent individual emails
 		prisma.email_outreach_queue.findMany({
 			where: {
-				status: { in: ['sent', 'failed', 'bounced'] }
+				status: { in: ['sent', 'failed', 'bounced', 'suppressed', 'complained'] }
 			},
 			include: {
 				colleges: {
@@ -32,10 +34,10 @@ export const load: PageServerLoad = async () => {
 		})
 	]);
 
-	const [pending, sent, failed, bounced] = queueStats;
+	const [pending, sent, failed, bounced, suppressed, complained] = queueStats;
 
 	return {
-		stats: { pending, sent, failed, bounced },
+		stats: { pending, sent, failed, bounced, suppressed, complained },
 		logs: recentLogs.map((log) => ({
 			id: log.id.toString(),
 			run_started_at: log.run_started_at,
