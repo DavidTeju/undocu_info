@@ -49,7 +49,25 @@ jobs:
             git pull --ff-only origin main
             test "$(git rev-parse HEAD)" = "${{ github.sha }}"
             cd app
-            docker build -t undocu_app .
+            read_env() {
+              value="$(grep -m1 "^$1=" .env | cut -d= -f2-)"
+              value="${value%\"}"
+              value="${value#\"}"
+              value="${value%\'}"
+              value="${value#\'}"
+              printf '%s' "$value"
+            }
+            PUBLIC_SUPABASE_URL="$(read_env PUBLIC_SUPABASE_URL)"
+            PUBLIC_SUPABASE_ANON_KEY="$(read_env PUBLIC_SUPABASE_ANON_KEY)"
+            PUBLIC_FILES_ROOT="$(read_env PUBLIC_FILES_ROOT)"
+            test -n "$PUBLIC_SUPABASE_URL"
+            test -n "$PUBLIC_SUPABASE_ANON_KEY"
+            test -n "$PUBLIC_FILES_ROOT"
+            docker build \
+              --build-arg PUBLIC_SUPABASE_URL="$PUBLIC_SUPABASE_URL" \
+              --build-arg PUBLIC_SUPABASE_ANON_KEY="$PUBLIC_SUPABASE_ANON_KEY" \
+              --build-arg PUBLIC_FILES_ROOT="$PUBLIC_FILES_ROOT" \
+              -t undocu_app .
             docker rm -f undocu_app 2>/dev/null || true
             docker run -d \
               --name undocu_app \
