@@ -31,7 +31,7 @@ import {
 	getShowcasePool,
 	pickShowcaseForRecipient
 } from './lib/emailRenderers';
-import { getPrismaDatabaseUrl } from './lib/env';
+import { getPositiveIntegerEnv, getPrismaDatabaseUrl } from './lib/env';
 
 // Load environment variables
 config();
@@ -44,7 +44,8 @@ const prisma = new PrismaClient({
 });
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const DAILY_LIMIT = 100;
+const DEFAULT_DAILY_LIMIT = 100;
+const DAILY_LIMIT = getPositiveIntegerEnv('EMAIL_DAILY_LIMIT') ?? DEFAULT_DAILY_LIMIT;
 
 /**
  * Queue emails for all eligible universities
@@ -328,6 +329,9 @@ Commands:
 Environment variables required:
   RESEND_API_KEY    - Your Resend API key
   DATABASE_URL      - PostgreSQL connection string
+
+Optional:
+  EMAIL_DAILY_LIMIT - Override the send batch size (default: ${DEFAULT_DAILY_LIMIT})
 `);
 	}
 

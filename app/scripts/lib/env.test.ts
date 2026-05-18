@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getPrismaDatabaseUrl, normalizeEnvValue } from './env';
+import { getPositiveIntegerEnv, getPrismaDatabaseUrl, normalizeEnvValue } from './env';
 
 describe('script environment helpers', () => {
 	it('strips matching quotes from env-file values', () => {
@@ -34,6 +34,19 @@ describe('script environment helpers', () => {
 	it('rejects non-Postgres URLs', () => {
 		expect(() => getPrismaDatabaseUrl({ DATABASE_URL: '"mysql://db.example/app"' })).toThrow(
 			'DATABASE_URL must use postgres:// or postgresql://'
+		);
+	});
+
+	it('parses quoted positive integer env values', () => {
+		expect(getPositiveIntegerEnv('EMAIL_DAILY_LIMIT', { EMAIL_DAILY_LIMIT: '"5"' })).toBe(5);
+	});
+
+	it('rejects non-positive integer env values', () => {
+		expect(() => getPositiveIntegerEnv('EMAIL_DAILY_LIMIT', { EMAIL_DAILY_LIMIT: '0' })).toThrow(
+			'EMAIL_DAILY_LIMIT must be a positive integer'
+		);
+		expect(() => getPositiveIntegerEnv('EMAIL_DAILY_LIMIT', { EMAIL_DAILY_LIMIT: '1.5' })).toThrow(
+			'EMAIL_DAILY_LIMIT must be a positive integer'
 		);
 	});
 });

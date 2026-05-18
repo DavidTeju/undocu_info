@@ -30,6 +30,25 @@ export function getPrismaDatabaseUrl(env: NodeJS.ProcessEnv = process.env): stri
 	return url;
 }
 
+export function getPositiveIntegerEnv(
+	name: string,
+	env: NodeJS.ProcessEnv = process.env
+): number | undefined {
+	const value = normalizeEnvValue(env[name]);
+	if (value == null) return undefined;
+
+	if (!/^\d+$/.test(value)) {
+		throw new Error(`${name} must be a positive integer`);
+	}
+
+	const parsed = Number.parseInt(value, 10);
+	if (parsed < 1) {
+		throw new Error(`${name} must be a positive integer`);
+	}
+
+	return parsed;
+}
+
 function isDockerInternalDatabaseUrl(url: string | undefined): url is string {
 	if (!url) return false;
 
