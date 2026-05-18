@@ -10,3 +10,7 @@
 
 # Claude Code
 .claude/
+
+# Local scratch / dev outputs
+tmp/
+.playwright-mcp/
