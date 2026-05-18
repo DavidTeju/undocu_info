@@ -24,6 +24,7 @@ import {
 	pickShowcaseForRecipient,
 	type ShowcaseUniversity
 } from './lib/emailRenderers';
+import { getPrismaDatabaseUrl } from './lib/env';
 
 config();
 
@@ -32,7 +33,7 @@ const OUT_DIR = join(__dirname, '..', '..', 'tmp', 'email-previews');
 
 const prisma = new PrismaClient({
 	datasources: {
-		db: { url: process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL }
+		db: { url: getPrismaDatabaseUrl() }
 	}
 });
 

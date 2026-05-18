@@ -31,6 +31,7 @@ import {
 	getShowcasePool,
 	pickShowcaseForRecipient
 } from './lib/emailRenderers';
+import { getPrismaDatabaseUrl } from './lib/env';
 
 // Load environment variables
 config();
@@ -38,7 +39,7 @@ config();
 // Use direct connection to avoid pooler prepared statement issues
 const prisma = new PrismaClient({
 	datasources: {
-		db: { url: process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL }
+		db: { url: getPrismaDatabaseUrl() }
 	}
 });
 const resend = new Resend(process.env.RESEND_API_KEY);
