@@ -52,7 +52,7 @@ jobs:
               --name undocu_app \
               --network supabase_default \
               --env-file .env \
-              -p 4173:4173 \
+              -p 127.0.0.1:4173:4173 \
               --restart unless-stopped \
               undocu_app
             docker image prune -f
