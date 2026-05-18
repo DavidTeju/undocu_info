@@ -40,7 +40,7 @@
 			<p class="num-colleges">{numColleges} College{numColleges > 1 ? 's' : ''} Found!</p>
 		{/if}
 
-		{#each collegesByStateFiltered as { state, colleges }}
+		{#each collegesByStateFiltered as { state, colleges } (state)}
 			<h2>{state}</h2>
 			<div class="state-list">
 				{#each colleges as college (college.id)}

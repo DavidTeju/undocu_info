@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { PUBLIC_FILES_ROOT } from '$env/static/public';
 
 	let { college }: { college: { domain: string; name: string } } = $props();
@@ -16,7 +17,7 @@
 	}
 </script>
 
-<a href={`/college/${domain}`} class="parent">
+<a href={resolve('/college/[college_domain]', { college_domain: domain })} class="parent">
 	<img class="first" alt="Image of ${name} campus" onerror={handleError} {src} />
 	<div class="last">
 		<span>

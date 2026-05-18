@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import 'normalize.css';
 
 	let { children } = $props();
@@ -7,7 +8,7 @@
 <div class="background">
 	<div class="page-wrapper">
 		<nav>
-			<p class="site-title"><a href="/">Undocu-Info</a></p>
+			<p class="site-title"><a href={resolve('/')}>Undocu-Info</a></p>
 			<p class="source-code"><a href="https://github.com/DavidTeju/undocu_info">Source Code</a></p>
 		</nav>
 		{@render children()}

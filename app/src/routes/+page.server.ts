@@ -4,6 +4,12 @@ import stateCodeData from '$lib/statecodes.json';
 
 const stateCodes = stateCodeData as Record<string, string>;
 
+function compareStateNames(stateA: string, stateB: string) {
+	if (stateA === 'Unknown') return 1;
+	if (stateB === 'Unknown') return -1;
+	return stateA.localeCompare(stateB);
+}
+
 export const load: PageServerLoad = async () => {
 	const colleges = await prisma.colleges.findMany({
 		where: {
@@ -28,9 +34,7 @@ export const load: PageServerLoad = async () => {
 	);
 
 	const collegesByStateSorted = Object.entries(collegesByState)
-		.sort(([stateA], [stateB]) =>
-			stateA === 'Unknown' ? 1 : stateB === 'Unknown' ? -1 : stateA.localeCompare(stateB)
-		)
+		.sort(([stateA], [stateB]) => compareStateNames(stateA, stateB))
 		.map(([state, colleges]) => ({
 			state,
 			colleges

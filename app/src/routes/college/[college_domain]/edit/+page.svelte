@@ -36,7 +36,9 @@
 	// Track which previews actually overflow and need "Show more"
 	let overflowingPreviews: Record<string, boolean> = $state({});
 
-	function checkOverflowAction(node: HTMLElement, params: { fieldId: string }) {
+	function checkOverflowAction(node: HTMLElement, initialParams: { fieldId: string }) {
+		let params = initialParams;
+
 		// Check overflow after the element is mounted and styled
 		const check = () => {
 			overflowingPreviews[params.fieldId] = node.scrollHeight > node.clientHeight;
@@ -64,7 +66,7 @@
 	// Build a map of question id -> question text for easy lookup
 	const questionMap: Record<string, string> = {};
 	const originalResponses: Record<string, string | null> = {};
-	for (const [_category, questions] of Object.entries(questionsCategorized)) {
+	for (const questions of Object.values(questionsCategorized)) {
 		if (questions) {
 			for (const q of questions) {
 				questionMap[q.id.toString()] = q.question;
@@ -274,11 +276,11 @@
 			></textarea>
 		</section>
 
-		{#each Object.entries(question_categories) as [category, categoryText]}
+		{#each Object.entries(question_categories) as [category, categoryText] (category)}
 			<section class="category" class:disabled={!isVerified}>
 				<h2>{categoryText}</h2>
 				{#if questionsCategorized[category]}
-					{#each questionsCategorized[category] as { id, question, response }}
+					{#each questionsCategorized[category] as { id, question, response } (id)}
 						{@const fieldId = id.toString()}
 						{@const isExpanded = expandedFields[fieldId]}
 						{@const currentValue = editedValues[fieldId] ?? response}
@@ -415,7 +417,7 @@
 					</div>
 				{:else}
 					{#if changes.length > 0}
-						{#each changes as change}
+						{#each changes as change (change.fieldId)}
 							<div class="change-card" class:delete-card={change.isDelete}>
 								<h3 class="change-question">{change.question}</h3>
 								{#if change.isDelete}

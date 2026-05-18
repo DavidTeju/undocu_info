@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		data: PageData;
@@ -48,12 +49,18 @@
 		</div>
 	{:else}
 		<div class="suggestions-list">
-			{#each data.suggestions as suggestion}
+			{#each data.suggestions as suggestion (suggestion.id)}
 				<article class="suggestion-card">
 					<header class="suggestion-header">
 						<div class="suggestion-meta">
 							<h2>{suggestion.college_name}</h2>
-							<a href="/college/{suggestion.college_domain}" target="_blank" class="domain-link">
+							<a
+								href={resolve('/college/[college_domain]', {
+									college_domain: suggestion.college_domain
+								})}
+								target="_blank"
+								class="domain-link"
+							>
 								{suggestion.college_domain}.edu
 							</a>
 						</div>
@@ -70,7 +77,7 @@
 					</header>
 
 					<div class="changes">
-						{#each Object.entries(suggestion.content) as [questionId, change]}
+						{#each Object.entries(suggestion.content) as [questionId, change] (questionId)}
 							{@const currentValue =
 								data.currentResponseMap[`${suggestion.college_domain}-${questionId}`] ?? null}
 							{@const dataChangedSinceProposal = currentValue !== change.oldResponse}

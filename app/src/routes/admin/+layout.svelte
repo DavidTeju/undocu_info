@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		data: LayoutData;
-		children: import('svelte').Snippet;
+		children: Snippet;
 	}
 
 	let { data, children }: Props = $props();

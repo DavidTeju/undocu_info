@@ -1,6 +1,7 @@
 <script lang="ts">
 	import question_categories from '$lib/question_categories.json';
 	import type { PageData } from './$types';
+	import { resolve } from '$app/paths';
 	import { linkify } from '$lib/linkify';
 	import { PUBLIC_FILES_ROOT } from '$env/static/public';
 
@@ -25,7 +26,10 @@
 					<p>{college?.city}, {college.state}</p>
 				{/if}
 				<a href="https://{domain}.edu">https://{domain}.edu</a>
-				<a href="/college/{domain}/edit" class="suggest-edit">
+				<a
+					href={resolve('/college/[college_domain]/edit', { college_domain: domain })}
+					class="suggest-edit"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="12"
@@ -44,10 +48,10 @@
 				</a>
 			</div>
 
-			{#each Object.entries(college.responses) as [category, responses]}
+			{#each Object.entries(college.responses) as [category, responses] (category)}
 				<h3>{question_categories[category as keyof typeof question_categories]}</h3>
 				<ul>
-					{#each responses as { questions: { question: questionText }, response: responseText }}
+					{#each responses as { id, questions: { question: questionText }, response: responseText } (id)}
 						{#if questionText !== 'Gives aid?'}
 							<!--TODO: Make a plan for this (gives aid)-->
 							<li class="response">
