@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+	<body
+		style="
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background-color: #fbf5f2;
+			margin: 0;
+			padding: 40px 20px;
+		"
+	>
+		<div
+			style="
+				max-width: 600px;
+				margin: 0 auto;
+				background-color: #ffffff;
+				border-radius: 12px;
+				padding: 32px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+			"
+		>
+			<h1 style="margin: 0 0 16px 0; font-size: 24px; font-weight: 600; color: #272838">
+				Hello from UndocuStudent.org
+			</h1>
+
+			<p style="margin: 0 0 16px 0; font-size: 15px; color: #333; line-height: 1.6">
+				My name is <strong>David Tejuosho</strong>. You can learn more about me on
+				<a href="https://www.linkedin.com/in/david-tejuosho/" style="color: #2563eb">LinkedIn</a>
+				or at
+				<a href="https://davidteju.dev/" style="color: #2563eb">davidteju.dev</a>.
+			</p>
+
+			<p style="margin: 0 0 16px 0; font-size: 15px; color: #333; line-height: 1.6">
+				I'm reaching out on behalf of
+				<a href="https://undocustudent.org" style="color: #2563eb"
+					><strong>UndocuStudent.org</strong></a
+				>, a free resource that helps undocumented students understand college policies on
+				admissions, financial aid, and campus life.
+			</p>
+
+			<p style="margin: 0 0 16px 0; font-size: 15px; color: #333; line-height: 1.6">
+				We've created a page for <strong>{{COLLEGE_NAME}}</strong>, but we don't yet have verified
+				information about your policies for undocumented students. This information is crucial for
+				students making important decisions about their education.
+			</p>
+
+			<p style="margin: 0 0 8px 0; font-size: 14px; color: #555; font-weight: 600">
+				See how other universities have contributed:
+			</p>
+			<ul
+				style="
+					margin: 0 0 16px 0;
+					padding-left: 20px;
+					font-size: 14px;
+					color: #555;
+					line-height: 1.8;
+				"
+			>
+				{{SHOWCASE_LINKS}}
+			</ul>
+
+			<hr style="border: none; border-top: 1px solid #eee; margin: 24px 0" />
+			<div
+				style="
+					background-color: #f0f9ff;
+					border-left: 4px solid #2563eb;
+					padding: 16px;
+					margin: 24px 0;
+					border-radius: 0 8px 8px 0;
+				"
+			>
+				<p style="margin: 0 0 8px 0; font-size: 15px; color: #333; font-weight: 600">
+					How you can help:
+				</p>
+				<p style="margin: 0; font-size: 15px; color: #333; line-height: 1.6">
+					Visit your university's page and suggest edits with accurate policy information. The
+					process is simple and takes just a few minutes.
+				</p>
+			</div>
+
+			<div style="text-align: center; margin: 24px 0">
+				<a
+					href="{{EDIT_URL}}"
+					style="
+						display: inline-block;
+						background-color: #2563eb;
+						color: white;
+						padding: 14px 28px;
+						text-decoration: none;
+						border-radius: 8px;
+						font-weight: 600;
+						font-size: 15px;
+					"
+				>
+					Update {{COLLEGE_NAME}}'s Information
+				</a>
+			</div>
+
+			<p style="margin: 0 0 8px 0; font-size: 14px; color: #555">You can also:</p>
+			<ul
+				style="
+					margin: 0 0 16px 0;
+					padding-left: 20px;
+					font-size: 14px;
+					color: #555;
+					line-height: 1.6;
+				"
+			>
+				<li>
+					<a href="{{VIEW_URL}}" style="color: #2563eb">View your current page</a> (some fields may
+					already have placeholder content)
+				</li>
+				<li>Reply to this email with the information directly</li>
+			</ul>
+
+			<hr style="border: none; border-top: 1px solid #eee; margin: 24px 0" />
+
+			<p style="margin: 0 0 16px 0; font-size: 14px; color: #555; line-height: 1.6">
+				Thank you for considering this request. Your contribution helps students navigate an often
+				confusing process and make informed decisions about their futures.
+			</p>
+
+			<p style="margin: 0; font-size: 14px; color: #555">
+				Best regards,<br />
+				<strong>{{SENDER_NAME}}</strong><br />
+				UndocuStudent.org
+			</p>
+		</div>
+
+		<p style="text-align: center; margin-top: 24px; font-size: 12px; color: #888">
+			This is a one-time outreach email. You won't receive marketing emails from us.
+		</p>
+	</body>
+</html>
