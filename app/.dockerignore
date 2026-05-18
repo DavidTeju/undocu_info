@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+
+node_modules
+build
+.svelte-kit
+.vite
+coverage
+
+.idea
+.playwright-mcp
+tmp
+*.log
+npm-debug.log*
