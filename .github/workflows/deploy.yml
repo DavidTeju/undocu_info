@@ -42,8 +42,12 @@ jobs:
           username: ${{ vars.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             cd /root/undocu_info
-            git pull
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            test "$(git rev-parse HEAD)" = "${{ github.sha }}"
             cd app
             docker stop undocu_app
             docker rm undocu_app
