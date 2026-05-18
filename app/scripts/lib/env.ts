@@ -15,7 +15,9 @@ export function normalizeEnvValue(value: string | undefined): string | undefined
 }
 
 export function getPrismaDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
-	const url = normalizeEnvValue(env.DIRECT_DATABASE_URL) ?? normalizeEnvValue(env.DATABASE_URL);
+	const databaseUrl = normalizeEnvValue(env.DATABASE_URL);
+	const directUrl = normalizeEnvValue(env.DIRECT_DATABASE_URL);
+	const url = isDockerInternalDatabaseUrl(databaseUrl) ? databaseUrl : (directUrl ?? databaseUrl);
 	if (!url) {
 		throw new Error('DIRECT_DATABASE_URL or DATABASE_URL must be set');
 	}
@@ -26,4 +28,14 @@ export function getPrismaDatabaseUrl(env: NodeJS.ProcessEnv = process.env): stri
 	}
 
 	return url;
+}
+
+function isDockerInternalDatabaseUrl(url: string | undefined): url is string {
+	if (!url) return false;
+
+	try {
+		return new URL(url).hostname === 'db';
+	} catch {
+		return false;
+	}
 }

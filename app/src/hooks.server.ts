@@ -77,8 +77,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Log request after response resolves
 	const duration = Date.now() - start;
-	console.log(
-		JSON.stringify({
+	process.stdout.write(
+		`${JSON.stringify({
 			timestamp: new Date().toISOString(),
 			requestId,
 			method: event.request.method,
@@ -86,7 +86,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			status: response.status,
 			duration,
 			userAgent: event.request.headers.get('user-agent')?.slice(0, 100)
-		})
+		})}\n`
 	);
 
 	return response;

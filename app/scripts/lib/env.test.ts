@@ -16,6 +16,15 @@ describe('script environment helpers', () => {
 		).toBe('postgresql://db.external/app');
 	});
 
+	it('prefers the Docker-internal database URL over an external direct URL', () => {
+		expect(
+			getPrismaDatabaseUrl({
+				DATABASE_URL: 'postgresql://postgres:postgres@db:5432/postgres',
+				DIRECT_DATABASE_URL: '"postgresql://postgres:postgres@82.29.152.139:5432/postgres"'
+			})
+		).toBe('postgresql://postgres:postgres@db:5432/postgres');
+	});
+
 	it('falls back to DATABASE_URL when DIRECT_DATABASE_URL is unset', () => {
 		expect(getPrismaDatabaseUrl({ DATABASE_URL: 'postgres://db.internal/app' })).toBe(
 			'postgres://db.internal/app'
