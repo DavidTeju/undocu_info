@@ -49,9 +49,8 @@ jobs:
             git pull --ff-only origin main
             test "$(git rev-parse HEAD)" = "${{ github.sha }}"
             cd app
-            docker stop undocu_app
-            docker rm undocu_app
             docker build -t undocu_app .
+            docker rm -f undocu_app 2>/dev/null || true
             docker run -d \
               --name undocu_app \
               --network supabase_default \

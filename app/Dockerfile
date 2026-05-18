@@ -6,7 +6,7 @@ WORKDIR /usr/local/app
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --ignore-scripts
 COPY . .
 
 # Set default env vars for build (override at runtime)
