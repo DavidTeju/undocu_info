@@ -51,6 +51,7 @@ const resend = new Resend(resendApiKey);
 
 const DEFAULT_DAILY_LIMIT = 100;
 const DAILY_LIMIT = getPositiveIntegerEnv('EMAIL_DAILY_LIMIT') ?? DEFAULT_DAILY_LIMIT;
+const SEND_DELAY_MS = 250;
 
 /**
  * Queue emails for all eligible universities
@@ -237,8 +238,7 @@ async function sendEmails(): Promise<void> {
 			});
 		}
 
-		// Rate limiting delay
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		await new Promise((resolve) => setTimeout(resolve, SEND_DELAY_MS));
 	}
 
 	await prisma.email_outreach_log.update({
