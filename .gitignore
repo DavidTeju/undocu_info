@@ -14,3 +14,4 @@
 # Local scratch / dev outputs
 tmp/
 .playwright-mcp/
+.bounce-test/

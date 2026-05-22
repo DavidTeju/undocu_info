@@ -29,33 +29,54 @@
 <main>
 	<div class="header">
 		<h1>Email Outreach</h1>
-		<p class="subtitle">Queue status and send history</p>
+		<p class="subtitle">Eligibility and send history</p>
 	</div>
 
-	<section class="stats-grid">
-		<div class="stat-card">
-			<span class="stat-value">{data.stats.pending}</span>
-			<span class="stat-label">Pending</span>
+	<section class="eligible-section">
+		<h2>Eligible to Send</h2>
+		<div class="eligible-grid">
+			<div class="eligible-card total">
+				<span class="eligible-value">{data.eligible.total}</span>
+				<span class="eligible-label">Total</span>
+			</div>
+			<div class="eligible-card tier-1">
+				<span class="eligible-value">{data.eligible.tier1}</span>
+				<span class="eligible-label">Tier 1 (safe / role)</span>
+			</div>
+			<div class="eligible-card tier-2">
+				<span class="eligible-value">{data.eligible.tier2}</span>
+				<span class="eligible-label">Tier 2 (catch-all)</span>
+			</div>
+			<div class="eligible-card tier-3">
+				<span class="eligible-value">{data.eligible.tier3}</span>
+				<span class="eligible-label">Tier 3 (unverified)</span>
+			</div>
 		</div>
-		<div class="stat-card sent">
-			<span class="stat-value">{data.stats.sent}</span>
-			<span class="stat-label">Sent</span>
-		</div>
-		<div class="stat-card failed">
-			<span class="stat-value">{data.stats.failed}</span>
-			<span class="stat-label">Failed</span>
-		</div>
-		<div class="stat-card bounced">
-			<span class="stat-value">{data.stats.bounced}</span>
-			<span class="stat-label">Bounced</span>
-		</div>
-		<div class="stat-card suppressed">
-			<span class="stat-value">{data.stats.suppressed}</span>
-			<span class="stat-label">Suppressed</span>
-		</div>
-		<div class="stat-card complained">
-			<span class="stat-value">{data.stats.complained}</span>
-			<span class="stat-label">Complained</span>
+	</section>
+
+	<section class="stats-grid-section">
+		<h2>Send History</h2>
+		<div class="stats-grid">
+			<div class="stat-card sent">
+				<span class="stat-value">{data.stats.sent}</span>
+				<span class="stat-label">Sent</span>
+			</div>
+			<div class="stat-card failed">
+				<span class="stat-value">{data.stats.failed}</span>
+				<span class="stat-label">Failed</span>
+			</div>
+			<div class="stat-card bounced">
+				<span class="stat-value">{data.stats.bounced}</span>
+				<span class="stat-label">Bounced</span>
+			</div>
+			<div class="stat-card suppressed">
+				<span class="stat-value">{data.stats.suppressed}</span>
+				<span class="stat-label">Suppressed</span>
+			</div>
+			<div class="stat-card complained">
+				<span class="stat-value">{data.stats.complained}</span>
+				<span class="stat-label">Complained</span>
+			</div>
 		</div>
 	</section>
 
@@ -167,12 +188,57 @@
 		}
 	}
 
+	.eligible-section,
+	.stats-grid-section {
+		max-width: 70rem;
+		margin: 0 auto 2.5rem;
+	}
+
+	.eligible-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		gap: 1rem;
+	}
+
+	.eligible-card {
+		background: white;
+		border-radius: 0.75rem;
+		padding: 1.25rem;
+		text-align: center;
+		border: 1px solid rgba(39, 40, 56, 0.1);
+
+		.eligible-value {
+			display: block;
+			font-size: 2rem;
+			font-weight: 700;
+			color: #272838;
+		}
+
+		.eligible-label {
+			font-size: 0.85rem;
+			color: #666;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+		}
+
+		&.total .eligible-value {
+			color: #272838;
+		}
+		&.tier-1 .eligible-value {
+			color: #207040;
+		}
+		&.tier-2 .eligible-value {
+			color: #1d4ed8;
+		}
+		&.tier-3 .eligible-value {
+			color: #856404;
+		}
+	}
+
 	.stats-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 		gap: 1rem;
-		max-width: 70rem;
-		margin: 0 auto 2.5rem;
 	}
 
 	.stat-card {

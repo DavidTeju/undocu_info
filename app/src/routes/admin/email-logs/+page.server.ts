@@ -1,29 +1,30 @@
 import type { PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
+import { buildEligibleAddressesSql, getSentHistoryCutoff } from '$lib/server/eligibility';
 
 export const load: PageServerLoad = async () => {
-	const [queueStats, recentLogs, recentEmails] = await Promise.all([
-		// Queue statistics
+	const eligibleSql = buildEligibleAddressesSql(getSentHistoryCutoff());
+
+	const [sendsStats, eligibleByTier, recentLogs, recentEmails] = await Promise.all([
 		Promise.all([
-			prisma.email_outreach_queue.count({ where: { status: 'pending' } }),
-			prisma.email_outreach_queue.count({ where: { status: 'sent' } }),
-			prisma.email_outreach_queue.count({ where: { status: 'failed' } }),
-			prisma.email_outreach_queue.count({ where: { status: 'bounced' } }),
-			prisma.email_outreach_queue.count({ where: { status: 'suppressed' } }),
-			prisma.email_outreach_queue.count({ where: { status: 'complained' } })
+			prisma.email_outreach_sends.count({ where: { status: 'sent' } }),
+			prisma.email_outreach_sends.count({ where: { status: 'failed' } }),
+			prisma.email_outreach_sends.count({ where: { status: 'bounced' } }),
+			prisma.email_outreach_sends.count({ where: { status: 'suppressed' } }),
+			prisma.email_outreach_sends.count({ where: { status: 'complained' } })
 		]),
 
-		// Recent run logs
+		prisma.$queryRaw<Array<{ tier: number; n: bigint }>>`
+			SELECT tier, COUNT(*)::bigint AS n FROM (${eligibleSql}) ranked
+			GROUP BY tier
+		`,
+
 		prisma.email_outreach_log.findMany({
 			orderBy: { run_started_at: 'desc' },
 			take: 10
 		}),
 
-		// Recent individual emails
-		prisma.email_outreach_queue.findMany({
-			where: {
-				status: { in: ['sent', 'failed', 'bounced', 'suppressed', 'complained'] }
-			},
+		prisma.email_outreach_sends.findMany({
 			include: {
 				colleges: {
 					select: { name: true, domain: true }
@@ -34,10 +35,22 @@ export const load: PageServerLoad = async () => {
 		})
 	]);
 
-	const [pending, sent, failed, bounced, suppressed, complained] = queueStats;
+	const [sent, failed, bounced, suppressed, complained] = sendsStats;
+
+	const tierCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
+	for (const row of eligibleByTier) {
+		tierCounts[row.tier] = Number(row.n);
+	}
+	const totalEligible = tierCounts[1] + tierCounts[2] + tierCounts[3];
 
 	return {
-		stats: { pending, sent, failed, bounced, suppressed, complained },
+		stats: { sent, failed, bounced, suppressed, complained },
+		eligible: {
+			total: totalEligible,
+			tier1: tierCounts[1],
+			tier2: tierCounts[2],
+			tier3: tierCounts[3]
+		},
 		logs: recentLogs.map((log) => ({
 			id: log.id.toString(),
 			run_started_at: log.run_started_at,

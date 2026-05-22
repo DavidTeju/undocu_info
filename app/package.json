@@ -13,10 +13,11 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"prepare": "cd .. && git config core.hooksPath .husky",
-		"email:queue": "tsx scripts/email-outreach.ts queue",
 		"email:send": "tsx scripts/email-outreach.ts send",
 		"email:status": "tsx scripts/email-outreach.ts status",
-		"email:logs": "tsx scripts/email-outreach.ts logs"
+		"email:logs": "tsx scripts/email-outreach.ts logs",
+		"email:verify": "tsx scripts/verify-addresses.ts",
+		"email:import-verifications": "tsx scripts/import-reoon-csv.ts"
 	},
 	"lint-staged": {
 		"*.{js,ts,svelte}": [

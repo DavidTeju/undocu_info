@@ -6,7 +6,7 @@ import {
 	type ResendWebhookResult
 } from './resendWebhook';
 
-type QueueRow = {
+type SendRow = {
 	id: bigint;
 	college_id: number;
 	email_address: string;
@@ -24,7 +24,7 @@ function createEmailData(overrides: Partial<WebhookEventPayload['data']> = {}) {
 	};
 }
 
-function createDb(rows: QueueRow[]) {
+function createDb(rows: SendRow[]) {
 	const findMany = vi.fn(async (args: { where: Record<string, unknown> }) => {
 		if ('resend_email_id' in args.where) {
 			return rows
@@ -48,7 +48,7 @@ function createDb(rows: QueueRow[]) {
 
 	return {
 		db: {
-			email_outreach_queue: { findMany, updateMany },
+			email_outreach_sends: { findMany, updateMany },
 			email_outreach_suppression: { upsert }
 		} as unknown as Parameters<typeof handleResendWebhookEvent>[1],
 		findMany,
@@ -57,7 +57,7 @@ function createDb(rows: QueueRow[]) {
 	};
 }
 
-async function handle(event: WebhookEventPayload, rows: QueueRow[]): Promise<ResendWebhookResult> {
+async function handle(event: WebhookEventPayload, rows: SendRow[]): Promise<ResendWebhookResult> {
 	const { db } = createDb(rows);
 	return handleResendWebhookEvent(event, db);
 }
@@ -82,7 +82,7 @@ describe('Resend webhook handling', () => {
 			handled: true,
 			status: 'bounced',
 			matchType: 'resend_email_id',
-			matchedQueueIds: ['1'],
+			matchedSendIds: ['1'],
 			suppressedCount: 1
 		});
 		expect(updateMany).toHaveBeenCalledWith(
@@ -142,7 +142,7 @@ describe('Resend webhook handling', () => {
 		expect(result).toMatchObject({
 			status: 'suppressed',
 			matchType: 'recipient_single_college',
-			matchedQueueIds: ['2'],
+			matchedSendIds: ['2'],
 			suppressedCount: 1
 		});
 	});
@@ -163,7 +163,7 @@ describe('Resend webhook handling', () => {
 		expect(result).toMatchObject({
 			status: 'complained',
 			matchType: 'ambiguous_recipient',
-			matchedQueueIds: [],
+			matchedSendIds: [],
 			suppressedCount: 0
 		});
 		expect(updateMany).not.toHaveBeenCalled();

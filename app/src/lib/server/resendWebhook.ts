@@ -1,19 +1,20 @@
 import type { Prisma, PrismaClient } from '@prisma/client';
 import type { WebhookEventPayload } from 'resend';
+import { normalizeOptionalEmail } from './normalizeEmail';
 
-type EmailQueueRow = {
+type EmailSendRow = {
 	id: bigint;
 	college_id: number;
 	email_address: string;
 };
 
-type EmailWebhookDb = Pick<PrismaClient, 'email_outreach_queue' | 'email_outreach_suppression'>;
+type EmailWebhookDb = Pick<PrismaClient, 'email_outreach_sends' | 'email_outreach_suppression'>;
 
 type PermanentSuppressionReason = 'bounced' | 'suppressed' | 'complained';
-type QueueWebhookStatus = PermanentSuppressionReason | 'failed';
+type SendsWebhookStatus = PermanentSuppressionReason | 'failed';
 type MatchType = 'resend_email_id' | 'recipient_single_college' | 'none' | 'ambiguous_recipient';
 
-const PERMANENT_QUEUE_STATUSES: PermanentSuppressionReason[] = [
+const PERMANENT_SEND_STATUSES: PermanentSuppressionReason[] = [
 	'bounced',
 	'suppressed',
 	'complained'
@@ -21,9 +22,9 @@ const PERMANENT_QUEUE_STATUSES: PermanentSuppressionReason[] = [
 
 export interface ResendWebhookResult {
 	handled: boolean;
-	status?: QueueWebhookStatus;
+	status?: SendsWebhookStatus;
 	matchType?: MatchType;
-	matchedQueueIds: string[];
+	matchedSendIds: string[];
 	suppressedCount: number;
 	message?: string;
 }
@@ -38,11 +39,6 @@ function hasEmailData(
 	return (
 		isRecord(event.data) && typeof event.data.email_id === 'string' && Array.isArray(event.data.to)
 	);
-}
-
-function normalizeEmailAddress(email: string | undefined): string | null {
-	const normalized = email?.trim().toLowerCase();
-	return normalized || null;
 }
 
 function toPrismaJson(event: WebhookEventPayload): Prisma.InputJsonValue {
@@ -66,7 +62,7 @@ export function getPermanentSuppressionReason(
 	}
 }
 
-export function getQueueStatusForWebhook(event: WebhookEventPayload): QueueWebhookStatus | null {
+export function getQueueStatusForWebhook(event: WebhookEventPayload): SendsWebhookStatus | null {
 	const permanentReason = getPermanentSuppressionReason(event);
 	if (permanentReason) return permanentReason;
 	if (event.type === 'email.bounced' || event.type === 'email.failed') return 'failed';
@@ -104,12 +100,12 @@ export function formatWebhookQueueError(event: WebhookEventPayload): string {
 async function findQueueRowsForEvent(
 	event: WebhookEventPayload,
 	db: EmailWebhookDb
-): Promise<{ matchType: MatchType; rows: EmailQueueRow[] }> {
+): Promise<{ matchType: MatchType; rows: EmailSendRow[] }> {
 	if (!hasEmailData(event)) {
 		return { matchType: 'none', rows: [] };
 	}
 
-	const rowsByResendId = await db.email_outreach_queue.findMany({
+	const rowsByResendId = await db.email_outreach_sends.findMany({
 		where: { resend_email_id: event.data.email_id },
 		select: { id: true, college_id: true, email_address: true }
 	});
@@ -118,12 +114,12 @@ async function findQueueRowsForEvent(
 		return { matchType: 'resend_email_id', rows: rowsByResendId };
 	}
 
-	const recipient = normalizeEmailAddress(event.data.to[0]);
+	const recipient = normalizeOptionalEmail(event.data.to[0]);
 	if (!recipient) {
 		return { matchType: 'none', rows: [] };
 	}
 
-	const recipientRows = await db.email_outreach_queue.findMany({
+	const recipientRows = await db.email_outreach_sends.findMany({
 		where: { email_address: { equals: recipient, mode: 'insensitive' } },
 		select: { id: true, college_id: true, email_address: true },
 		orderBy: { created_at: 'desc' },
@@ -152,7 +148,7 @@ export async function handleResendWebhookEvent(
 	if (!status) {
 		return {
 			handled: false,
-			matchedQueueIds: [],
+			matchedSendIds: [],
 			suppressedCount: 0,
 			message: 'ignored event type'
 		};
@@ -164,7 +160,7 @@ export async function handleResendWebhookEvent(
 			handled: true,
 			status,
 			matchType,
-			matchedQueueIds: [],
+			matchedSendIds: [],
 			suppressedCount: 0,
 			message:
 				matchType === 'ambiguous_recipient'
@@ -178,10 +174,10 @@ export async function handleResendWebhookEvent(
 	const eventDetails = toPrismaJson(event);
 	const updateWhere =
 		status === 'failed'
-			? { id: { in: rows.map((row) => row.id) }, status: { notIn: PERMANENT_QUEUE_STATUSES } }
+			? { id: { in: rows.map((row) => row.id) }, status: { notIn: PERMANENT_SEND_STATUSES } }
 			: { id: { in: rows.map((row) => row.id) } };
 
-	await db.email_outreach_queue.updateMany({
+	await db.email_outreach_sends.updateMany({
 		where: updateWhere,
 		data: { status, error_message: errorMessage }
 	});
@@ -219,7 +215,7 @@ export async function handleResendWebhookEvent(
 		handled: true,
 		status,
 		matchType,
-		matchedQueueIds: rows.map((row) => row.id.toString()),
+		matchedSendIds: rows.map((row) => row.id.toString()),
 		suppressedCount: permanentReason ? rows.length : 0
 	};
 }
