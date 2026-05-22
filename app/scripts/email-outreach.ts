@@ -149,6 +149,7 @@ async function sendEmails(): Promise<void> {
 				to: candidate.email_address,
 				subject: emailContent.subject,
 				html: emailContent.html,
+				text: emailContent.text,
 				headers: buildUnsubscribeHeaders(college.id, candidate.email_address, unsubscribeSecret)
 			});
 

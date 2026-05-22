@@ -1,124 +1,45 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	</head>
-	<body
-		style="
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-			background-color: #fbf5f2;
-			margin: 0;
-			padding: 40px 20px;
-		"
-	>
-		<div
-			style="
-				max-width: 600px;
-				margin: 0 auto;
-				background-color: #ffffff;
-				border-radius: 12px;
-				padding: 32px;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			"
-		>
-			<h1 style="margin: 0 0 16px 0; font-size: 24px; font-weight: 600; color: #272838">
-				Thank You from UndocuStudent.org
-			</h1>
+	<body>
+		<p>
+			My name is David Tejuosho, a new-grad software engineer student working on a small directory
+			that helps undocumented students learn more about admissions, financial aid and student life
+			as prospective schools. You can learn more about me on
+			<a href="https://www.linkedin.com/in/david-tejuosho/">LinkedIn</a> or at
+			<a href="https://davidteju.dev/">davidteju.dev</a>.
+		</p>
 
-			<p style="margin: 0 0 16px 0; font-size: 15px; color: #333; line-height: 1.6">
-				My name is <strong>David Tejuosho</strong>. You can learn more about me on
-				<a href="https://www.linkedin.com/in/david-tejuosho/" style="color: #2563eb">LinkedIn</a>
-				or at
-				<a href="https://davidteju.dev/" style="color: #2563eb">davidteju.dev</a>.
-			</p>
+		<p>
+			I wanted to reach out and express our gratitude. {{COLLEGE_NAME}} has {{RESPONSE_COUNT}}
+			policy answers on undocustudent.org, helping undocumented students understand your
+			institution's support.
+		</p>
 
-			<p style="margin: 0 0 16px 0; font-size: 15px; color: #333; line-height: 1.6">
-				I wanted to reach out and express our gratitude. <strong>{{COLLEGE_NAME}}</strong> has
-				<strong>{{RESPONSE_COUNT}} policy answers</strong> on
-				<a href="https://undocustudent.org" style="color: #2563eb">undocustudent.org</a>, helping
-				undocumented students understand your institution's support.
-			</p>
+		<p>
+			This information makes a real difference for students navigating the college application and
+			enrollment process.
+		</p>
 
-			<p style="margin: 0 0 16px 0; font-size: 15px; color: #333; line-height: 1.6">
-				This information makes a real difference for students navigating the college application and
-				enrollment process.
-			</p>
+		<p>
+			Quick request: please take a moment to review your page and ensure the information is still
+			accurate. Policies may have changed, and we want to make sure students have the most
+			up-to-date information.
+		</p>
 
-			<div
-				style="
-					background-color: #f0fdf4;
-					border-left: 4px solid #22c55e;
-					padding: 16px;
-					margin: 24px 0;
-					border-radius: 0 8px 8px 0;
-				"
-			>
-				<p style="margin: 0 0 8px 0; font-size: 15px; color: #333; font-weight: 600">
-					Quick request:
-				</p>
-				<p style="margin: 0; font-size: 15px; color: #333; line-height: 1.6">
-					Please take a moment to review your page and ensure the information is still accurate.
-					Policies may have changed, and we want to make sure students have the most up-to-date
-					information.
-				</p>
-			</div>
+		<p>
+			<a href="{{VIEW_URL}}">View your page</a> or <a href="{{EDIT_URL}}">suggest updates</a>. You
+			can also reply to this email directly.
+		</p>
 
-			<div style="text-align: center; margin: 24px 0">
-				<a
-					href="{{VIEW_URL}}"
-					style="
-						display: inline-block;
-						background-color: #22c55e;
-						color: white;
-						padding: 14px 28px;
-						text-decoration: none;
-						border-radius: 8px;
-						font-weight: 600;
-						font-size: 15px;
-						margin-right: 12px;
-					"
-				>
-					View Your Page
-				</a>
-				<a
-					href="{{EDIT_URL}}"
-					style="
-						display: inline-block;
-						background-color: #2563eb;
-						color: white;
-						padding: 14px 28px;
-						text-decoration: none;
-						border-radius: 8px;
-						font-weight: 600;
-						font-size: 15px;
-					"
-				>
-					Suggest Updates
-				</a>
-			</div>
+		<p>
+			Thank you again for your commitment to supporting all students, regardless of immigration
+			status.
+		</p>
 
-			<p style="margin: 0 0 16px 0; font-size: 14px; color: #555; line-height: 1.6">
-				If you notice any outdated or incorrect information, you can suggest edits directly on the
-				page or reply to this email.
-			</p>
-
-			<hr style="border: none; border-top: 1px solid #eee; margin: 24px 0" />
-
-			<p style="margin: 0 0 16px 0; font-size: 14px; color: #555; line-height: 1.6">
-				Thank you again for your commitment to supporting all students, regardless of immigration
-				status.
-			</p>
-
-			<p style="margin: 0; font-size: 14px; color: #555">
-				With gratitude,<br />
-				<strong>{{SENDER_NAME}}</strong><br />
-				UndocuStudent.org
-			</p>
-		</div>
-
-		<p style="text-align: center; margin-top: 24px; font-size: 12px; color: #888">
-			This is an annual check-in email. You won't receive frequent emails from us.
+		<p>
+			With gratitude,<br />
+			{{SENDER_NAME}}<br />
+			UndocuStudent.org
 		</p>
 	</body>
 </html>

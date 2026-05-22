@@ -145,23 +145,55 @@ export function generateOutreachEmail(
 	collegeName: string,
 	collegeDomain: string,
 	showcaseUniversities: ShowcaseUniversity[]
-): { subject: string; html: string } {
-	const showcaseLinks = showcaseUniversities
+): { subject: string; html: string; text: string } {
+	const editUrl = `${BASE_URL}/college/${collegeDomain}/edit`;
+	const viewUrl = `${BASE_URL}/college/${collegeDomain}`;
+
+	const showcaseLinksHtml = showcaseUniversities
 		.map(
 			(u) =>
-				`<li><a href="${BASE_URL}/college/${u.domain}" style="color: #2563eb;">${u.name}</a> - ${u.responseCount} policy answers</li>`
+				`<li><a href="${BASE_URL}/college/${u.domain}">${u.name}</a> - ${u.responseCount} policy answers</li>`
 		)
-		.join('\n      ');
+		.join('\n');
+
+	const showcaseLinksText = showcaseUniversities
+		.map((u) => `- ${u.name} (${BASE_URL}/college/${u.domain}) - ${u.responseCount} policy answers`)
+		.join('\n');
 
 	const html = OUTREACH_TEMPLATE.replace(/\{\{COLLEGE_NAME\}\}/g, collegeName)
-		.replace(/\{\{EDIT_URL\}\}/g, `${BASE_URL}/college/${collegeDomain}/edit`)
-		.replace(/\{\{VIEW_URL\}\}/g, `${BASE_URL}/college/${collegeDomain}`)
-		.replace(/\{\{SHOWCASE_LINKS\}\}/g, showcaseLinks)
+		.replace(/\{\{EDIT_URL\}\}/g, editUrl)
+		.replace(/\{\{VIEW_URL\}\}/g, viewUrl)
+		.replace(/\{\{SHOWCASE_LINKS\}\}/g, showcaseLinksHtml)
 		.replace(/\{\{SENDER_NAME\}\}/g, SENDER_NAME);
+
+	const text = `My name is David Tejuosho, a new-grad software engineer student working on a small directory that helps undocumented students learn more about admissions, financial aid and student life as prospective schools. You can learn more about me on LinkedIn (https://www.linkedin.com/in/david-tejuosho/) or at davidteju.dev (https://davidteju.dev/).
+
+I'm reaching out on behalf of UndocuStudent.org, a free resource that helps undocumented students understand college policies on admissions, financial aid, and campus life.
+
+We've created a page for ${collegeName}, but we don't yet have verified information about your policies for undocumented students. This information is crucial for students making important decisions about their education.
+
+See how other universities have contributed:
+${showcaseLinksText}
+
+How you can help: visit your university's page and suggest edits with accurate policy information. The process is simple and takes just a few minutes.
+
+Update ${collegeName}'s information: ${editUrl}
+
+You can also:
+- View your current page: ${viewUrl} (some fields may already have placeholder content)
+- Reply to this email with the information directly
+
+Thank you for considering this request. Your contribution helps students navigate an often confusing process and make informed decisions about their futures.
+
+Best regards,
+${SENDER_NAME}
+UndocuStudent.org
+`;
 
 	return {
 		subject: `Help undocumented students learn about ${sanitizeSubjectPart(collegeName)}'s policies`,
-		html
+		html,
+		text
 	};
 }
 
@@ -169,15 +201,39 @@ export function generateAppreciationEmail(
 	collegeName: string,
 	collegeDomain: string,
 	responseCount: number
-): { subject: string; html: string } {
+): { subject: string; html: string; text: string } {
+	const editUrl = `${BASE_URL}/college/${collegeDomain}/edit`;
+	const viewUrl = `${BASE_URL}/college/${collegeDomain}`;
+
 	const html = APPRECIATION_TEMPLATE.replace(/\{\{COLLEGE_NAME\}\}/g, collegeName)
 		.replace(/\{\{RESPONSE_COUNT\}\}/g, String(responseCount))
-		.replace(/\{\{EDIT_URL\}\}/g, `${BASE_URL}/college/${collegeDomain}/edit`)
-		.replace(/\{\{VIEW_URL\}\}/g, `${BASE_URL}/college/${collegeDomain}`)
+		.replace(/\{\{EDIT_URL\}\}/g, editUrl)
+		.replace(/\{\{VIEW_URL\}\}/g, viewUrl)
 		.replace(/\{\{SENDER_NAME\}\}/g, SENDER_NAME);
+
+	const text = `My name is David Tejuosho, a new-grad software engineer student working on a small directory that helps undocumented students learn more about admissions, financial aid and student life as prospective schools. You can learn more about me on LinkedIn (https://www.linkedin.com/in/david-tejuosho/) or at davidteju.dev (https://davidteju.dev/).
+
+I wanted to reach out and express our gratitude. ${collegeName} has ${responseCount} policy answers on undocustudent.org, helping undocumented students understand your institution's support.
+
+This information makes a real difference for students navigating the college application and enrollment process.
+
+Quick request: please take a moment to review your page and ensure the information is still accurate. Policies may have changed, and we want to make sure students have the most up-to-date information.
+
+View your page: ${viewUrl}
+Suggest updates: ${editUrl}
+
+You can also reply to this email directly.
+
+Thank you again for your commitment to supporting all students, regardless of immigration status.
+
+With gratitude,
+${SENDER_NAME}
+UndocuStudent.org
+`;
 
 	return {
 		subject: `Thank you for supporting undocumented students at ${sanitizeSubjectPart(collegeName)}`,
-		html
+		html,
+		text
 	};
 }
