@@ -29,6 +29,7 @@ ENV PORT=4173
 
 RUN npx prisma generate
 RUN npm run build
+RUN npm run scripts:build
 
 FROM node:24-alpine
 WORKDIR /usr/local/app
@@ -42,7 +43,10 @@ COPY --from=build /usr/local/app/package*.json ./
 COPY --from=build /usr/local/app/node_modules ./node_modules
 COPY --from=build /usr/local/app/build ./build
 COPY --from=build /usr/local/app/prisma ./prisma
-COPY --from=build /usr/local/app/scripts ./scripts
+COPY --from=build /usr/local/app/dist-scripts ./dist-scripts
+# emailRenderers.ts loads templates via __dirname/../templates; with bundled
+# scripts at dist-scripts/, the templates folder must sit one level up.
+COPY --from=build /usr/local/app/scripts/templates ./templates
 
 EXPOSE 4173
 

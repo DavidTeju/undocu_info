@@ -15,3 +15,12 @@
 tmp/
 .playwright-mcp/
 .bounce-test/
+
+# Bundled scripts (built by tsup; shipped via Dockerfile, not committed)
+app/dist-scripts/
+# Local symlink used to test bundled scripts against scripts/templates
+app/templates
+
+# Claude Code skill outputs (ephemeral analysis files)
+/CODE_REVIEW.md
+/BUGS_FOUND.md
