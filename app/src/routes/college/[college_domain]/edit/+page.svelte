@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import question_categories from '$lib/question_categories.json';
 	import Error from '$lib/components/Error.svelte';
 	import { enhance } from '$app/forms';
@@ -7,7 +9,18 @@
 	const MAX_RESPONSE_LENGTH = 5000;
 
 	let { data, form } = $props();
-	const { questionsCategorized, collegeName, userEmail } = data;
+	const { questionsCategorized, collegeName, userEmail, tokenParam } = data;
+
+	// Strip ?t= from the visible URL so the token isn't shoulder-surfed, copy/pasted,
+	// or sent in the Referer header on outbound clicks. The server already captured it.
+	onMount(() => {
+		if (!browser) return;
+		const u = new URL(window.location.href);
+		if (u.searchParams.has('t')) {
+			u.searchParams.delete('t');
+			history.replaceState(history.state, '', u.toString());
+		}
+	});
 
 	// Auth state from form responses
 	$effect(() => {
@@ -153,6 +166,10 @@
 	};
 </script>
 
+<svelte:head>
+	<meta name="referrer" content="same-origin" />
+</svelte:head>
+
 <main>
 	<div class="header">
 		<h1>Suggest An Edit</h1>
@@ -261,6 +278,9 @@
 	{/if}
 
 	<form method="post" action="?/submit" bind:this={formElement}>
+		{#if tokenParam}
+			<input type="hidden" name="t" value={tokenParam} />
+		{/if}
 		<input type="hidden" name="remarks" value={remarks} />
 
 		<section class="notes-section" class:disabled={!isVerified}>

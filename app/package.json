@@ -19,11 +19,15 @@
 		"email:logs": "tsx scripts/email-outreach.ts logs",
 		"email:verify": "tsx scripts/verify-addresses.ts",
 		"email:import-verifications": "tsx scripts/import-reoon-csv.ts",
+		"email:followup": "tsx scripts/email-followup.ts",
+		"email:mint-url": "tsx scripts/mint-edit-token.ts",
 		"email:send:prod": "node dist-scripts/email-outreach.js send",
 		"email:status:prod": "node dist-scripts/email-outreach.js status",
 		"email:logs:prod": "node dist-scripts/email-outreach.js logs",
 		"email:verify:prod": "node dist-scripts/verify-addresses.js",
-		"email:import-verifications:prod": "node dist-scripts/import-reoon-csv.js"
+		"email:import-verifications:prod": "node dist-scripts/import-reoon-csv.js",
+		"email:followup:prod": "node dist-scripts/email-followup.js",
+		"email:mint-url:prod": "node dist-scripts/mint-edit-token.js"
 	},
 	"lint-staged": {
 		"*.{js,ts,svelte}": [

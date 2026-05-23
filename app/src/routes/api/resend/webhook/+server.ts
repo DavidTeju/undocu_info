@@ -1,26 +1,13 @@
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 import prisma from '$lib/prisma';
+import { normalizeEnvValue } from '$lib/server/env';
 import { handleResendWebhookEvent } from '$lib/server/resendWebhook';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { Resend, type WebhookEventPayload } from 'resend';
 
 function isMissingWebhookSecretAllowed() {
 	return dev || process.env.NODE_ENV === 'test';
-}
-
-function normalizeEnvValue(value: string | undefined) {
-	const trimmed = value?.trim();
-	if (!trimmed) return undefined;
-
-	if (
-		(trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-		(trimmed.startsWith("'") && trimmed.endsWith("'"))
-	) {
-		return trimmed.slice(1, -1);
-	}
-
-	return trimmed;
 }
 
 function getSvixHeaders(request: Request) {

@@ -24,3 +24,6 @@ app/templates
 # Claude Code skill outputs (ephemeral analysis files)
 /CODE_REVIEW.md
 /BUGS_FOUND.md
+
+# Local-only dev utility (not for prod)
+app/scripts/_dev-mint-token.ts

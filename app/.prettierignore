@@ -2,3 +2,6 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Bundled output (produced by tsup; not source)
+dist-scripts/

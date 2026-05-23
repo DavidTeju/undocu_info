@@ -1,18 +1,8 @@
+import { normalizeEnvValue } from '../../src/lib/server/env';
+
+export { normalizeEnvValue };
+
 const POSTGRES_PROTOCOLS = new Set(['postgresql:', 'postgres:']);
-
-export function normalizeEnvValue(value: string | undefined): string | undefined {
-	const trimmed = value?.trim();
-	if (!trimmed) return undefined;
-
-	if (
-		(trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-		(trimmed.startsWith("'") && trimmed.endsWith("'"))
-	) {
-		return trimmed.slice(1, -1);
-	}
-
-	return trimmed;
-}
 
 export function getPrismaDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
 	const databaseUrl = normalizeEnvValue(env.DATABASE_URL);

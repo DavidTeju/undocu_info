@@ -48,6 +48,10 @@ if (!resendApiKey) {
 }
 const resend = new Resend(resendApiKey);
 const unsubscribeSecret = getUnsubscribeSecret();
+const editAuthSecret = normalizeEnvValue(process.env.EDIT_AUTH_HMAC_SECRET);
+if (!editAuthSecret) {
+	throw new Error('EDIT_AUTH_HMAC_SECRET must be set');
+}
 
 const DEFAULT_DAILY_LIMIT = 100;
 const DAILY_LIMIT = getPositiveIntegerEnv('EMAIL_DAILY_LIMIT') ?? DEFAULT_DAILY_LIMIT;
@@ -134,13 +138,19 @@ async function sendEmails(): Promise<void> {
 
 		const responseCount = college._count.responses;
 		const emailType: 'appreciation' | 'outreach' = responseCount > 0 ? 'appreciation' : 'outreach';
+		const recipientCtx = {
+			collegeId: college.id,
+			collegeName: college.name,
+			collegeDomain: college.domain,
+			recipientEmail: candidate.email_address
+		};
 		const emailContent =
 			emailType === 'appreciation'
-				? generateAppreciationEmail(college.name, college.domain, responseCount)
+				? generateAppreciationEmail(recipientCtx, responseCount, editAuthSecret)
 				: generateOutreachEmail(
-						college.name,
-						college.domain,
-						pickShowcaseForRecipient(showcasePool, college)
+						recipientCtx,
+						pickShowcaseForRecipient(showcasePool, college),
+						editAuthSecret
 					);
 
 		try {

@@ -1,6 +1,9 @@
 import { svelteConfig } from '@davidteju/dev-config/eslint/svelte';
 
 export default [
+	{
+		ignores: ['dist-scripts/**']
+	},
 	...svelteConfig(),
 	// Project-specific rules
 	{

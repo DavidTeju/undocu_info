@@ -5,14 +5,11 @@ import { buildEligibleAddressesSql, getSentHistoryCutoff } from '$lib/server/eli
 export const load: PageServerLoad = async () => {
 	const eligibleSql = buildEligibleAddressesSql(getSentHistoryCutoff());
 
-	const [sendsStats, eligibleByTier, recentLogs, recentEmails] = await Promise.all([
-		Promise.all([
-			prisma.email_outreach_sends.count({ where: { status: 'sent' } }),
-			prisma.email_outreach_sends.count({ where: { status: 'failed' } }),
-			prisma.email_outreach_sends.count({ where: { status: 'bounced' } }),
-			prisma.email_outreach_sends.count({ where: { status: 'suppressed' } }),
-			prisma.email_outreach_sends.count({ where: { status: 'complained' } })
-		]),
+	const [sendsByStatus, eligibleByTier, recentLogs, recentEmails] = await Promise.all([
+		prisma.email_outreach_sends.groupBy({
+			by: ['status'],
+			_count: { _all: true }
+		}),
 
 		prisma.$queryRaw<Array<{ tier: number; n: bigint }>>`
 			SELECT tier, COUNT(*)::bigint AS n FROM (${eligibleSql}) ranked
@@ -35,7 +32,10 @@ export const load: PageServerLoad = async () => {
 		})
 	]);
 
-	const [sent, failed, bounced, suppressed, complained] = sendsStats;
+	const statusCounts: Record<string, number> = {};
+	for (const row of sendsByStatus) {
+		statusCounts[row.status] = row._count._all;
+	}
 
 	const tierCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
 	for (const row of eligibleByTier) {
@@ -44,7 +44,13 @@ export const load: PageServerLoad = async () => {
 	const totalEligible = tierCounts[1] + tierCounts[2] + tierCounts[3];
 
 	return {
-		stats: { sent, failed, bounced, suppressed, complained },
+		stats: {
+			sent: statusCounts.sent ?? 0,
+			failed: statusCounts.failed ?? 0,
+			bounced: statusCounts.bounced ?? 0,
+			suppressed: statusCounts.suppressed ?? 0,
+			complained: statusCounts.complained ?? 0
+		},
 		eligible: {
 			total: totalEligible,
 			tier1: tierCounts[1],

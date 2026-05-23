@@ -10,6 +10,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import type { PrismaClient } from '@prisma/client';
+import { buildEditAuthUrl } from '../../src/lib/server/editAuthToken';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, '..', 'templates');
@@ -26,7 +27,7 @@ export const BASE_URL = 'https://undocustudent.org';
 
 // Strip CRLF/tabs and collapse whitespace so DB-sourced values can't inject
 // email headers (Bcc:, Cc:, etc.) when interpolated into a Subject line.
-function sanitizeSubjectPart(value: string): string {
+export function sanitizeSubjectPart(value: string): string {
 	return value
 		.replace(/[\r\n\t]+/g, ' ')
 		.replace(/\s+/g, ' ')
@@ -141,12 +142,26 @@ export function pickShowcaseForRecipient(
 	return picked.sort((a, b) => b.responseCount - a.responseCount);
 }
 
+export interface RecipientContext {
+	collegeId: number;
+	collegeName: string;
+	collegeDomain: string;
+	recipientEmail: string;
+}
+
 export function generateOutreachEmail(
-	collegeName: string,
-	collegeDomain: string,
-	showcaseUniversities: ShowcaseUniversity[]
+	ctx: RecipientContext,
+	showcaseUniversities: ShowcaseUniversity[],
+	authSecret: string
 ): { subject: string; html: string; text: string } {
-	const editUrl = `${BASE_URL}/college/${collegeDomain}/edit`;
+	const { collegeId, collegeName, collegeDomain, recipientEmail } = ctx;
+	const editUrl = buildEditAuthUrl(
+		BASE_URL,
+		`/college/${collegeDomain}/edit`,
+		collegeId,
+		recipientEmail,
+		authSecret
+	);
 	const viewUrl = `${BASE_URL}/college/${collegeDomain}`;
 
 	const showcaseLinksHtml = showcaseUniversities
@@ -198,11 +213,18 @@ UndocuStudent.org
 }
 
 export function generateAppreciationEmail(
-	collegeName: string,
-	collegeDomain: string,
-	responseCount: number
+	ctx: RecipientContext,
+	responseCount: number,
+	authSecret: string
 ): { subject: string; html: string; text: string } {
-	const editUrl = `${BASE_URL}/college/${collegeDomain}/edit`;
+	const { collegeId, collegeName, collegeDomain, recipientEmail } = ctx;
+	const editUrl = buildEditAuthUrl(
+		BASE_URL,
+		`/college/${collegeDomain}/edit`,
+		collegeId,
+		recipientEmail,
+		authSecret
+	);
 	const viewUrl = `${BASE_URL}/college/${collegeDomain}`;
 
 	const html = APPRECIATION_TEMPLATE.replace(/\{\{COLLEGE_NAME\}\}/g, collegeName)

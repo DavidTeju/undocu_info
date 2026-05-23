@@ -120,7 +120,7 @@ async function findQueueRowsForEvent(
 	}
 
 	const recipientRows = await db.email_outreach_sends.findMany({
-		where: { email_address: { equals: recipient, mode: 'insensitive' } },
+		where: { email_address: recipient },
 		select: { id: true, college_id: true, email_address: true },
 		orderBy: { created_at: 'desc' },
 		take: 10

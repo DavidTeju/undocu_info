@@ -2,16 +2,41 @@ import type { Actions, PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
 import { redirect, fail } from '@sveltejs/kit';
 import { rateLimit } from '$lib/rateLimit';
+import { env } from '$env/dynamic/private';
+import { consumeEditAuthToken } from '$lib/server/editAuthToken';
 
 const MAX_RESPONSE_LENGTH = 5000;
 
-export const load: PageServerLoad = async ({ params, locals }) => {
-	// Check if user is already authenticated
-	let userEmail: string | null = null;
+// Verify a signed-token-bearing string against the URL's college. Returns the
+// attributed email if the token is valid AND its cid matches the resolved
+// college; null otherwise. Caller never needs to look up the college separately.
+async function attributeViaToken(
+	tokenStr: string | null,
+	collegeDomain: string
+): Promise<string | null> {
+	if (!tokenStr || !env.EDIT_AUTH_HMAC_SECRET) return null;
+	const attribution = consumeEditAuthToken(tokenStr, env.EDIT_AUTH_HMAC_SECRET);
+	if (!attribution) return null;
+	const college = await prisma.colleges.findUnique({
+		where: { domain: collegeDomain },
+		select: { id: true }
+	});
+	if (!college || attribution.collegeId !== college.id) return null;
+	return attribution.email;
+}
+
+export const load: PageServerLoad = async ({ params, locals, url }) => {
+	let sessionEmail: string | null = null;
 	if (locals.safeGetSession) {
 		const { user } = await locals.safeGetSession();
-		userEmail = user?.email ?? null;
+		sessionEmail = user?.email ?? null;
 	}
+
+	const tokenParam = url.searchParams.get('t');
+	const tokenEmail = await attributeViaToken(tokenParam, params.college_domain);
+
+	// Supabase session wins when both are present (more specific identity).
+	const userEmail = sessionEmail ?? tokenEmail;
 
 	const questions = await prisma.questions
 		.findMany({
@@ -49,7 +74,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const questionsCategorized = Object.groupBy(questions, (q) => q.category);
 
-	return { questionsCategorized, collegeName, userEmail };
+	return { questionsCategorized, collegeName, userEmail, tokenParam };
 };
 
 export const actions = {
@@ -109,23 +134,29 @@ export const actions = {
 		return { verified: true, verifiedEmail: data.user?.email };
 	},
 
-	submit: async ({ params, request, locals }) => {
-		// Verify authentication
-		if (!locals.safeGetSession) {
-			return fail(401, {
-				success: false,
-				reason: 'You must verify your email before submitting suggestions'
-			});
+	submit: async ({ params, request, locals, url }) => {
+		let submitterEmail: string | null = null;
+		if (locals.safeGetSession) {
+			const { user } = await locals.safeGetSession();
+			submitterEmail = user?.email ?? null;
 		}
-		const { user } = await locals.safeGetSession();
-		if (!user?.email) {
+
+		const formData = await request.formData();
+
+		if (!submitterEmail) {
+			const urlToken = url.searchParams.get('t');
+			const formTokenRaw = formData.get('t');
+			const formToken = typeof formTokenRaw === 'string' && formTokenRaw ? formTokenRaw : null;
+			submitterEmail = await attributeViaToken(urlToken ?? formToken, params.college_domain);
+		}
+
+		if (!submitterEmail) {
 			return fail(401, {
 				success: false,
 				reason: 'You must verify your email before submitting suggestions'
 			});
 		}
 
-		const formData = await request.formData();
 		const remarks = (formData.get('remarks') as string)?.trim() || null;
 
 		const questionsWithOldResponses = await prisma.questions.findMany({
@@ -185,7 +216,7 @@ export const actions = {
 			data: {
 				content: suggestionsAsObject,
 				college_domain: params.college_domain,
-				submitter_email: user.email,
+				submitter_email: submitterEmail,
 				remarks
 			}
 		});

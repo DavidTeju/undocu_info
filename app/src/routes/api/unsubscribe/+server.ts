@@ -22,13 +22,22 @@ function parseParams(url: URL): { cid: number; email: string; sig: string } | nu
 	return { cid, email, sig };
 }
 
+function escapeHtml(value: string): string {
+	return value
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
+}
+
 function htmlPage(title: string, message: string, status: number): Response {
 	const body = `<!doctype html>
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>${title}</title>
+	<title>${escapeHtml(title)}</title>
 	<style>
 		body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fbf5f2; margin: 0; padding: 40px 20px; }
 		main { max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
@@ -39,8 +48,8 @@ function htmlPage(title: string, message: string, status: number): Response {
 </head>
 <body>
 	<main>
-		<h1>${title}</h1>
-		<p>${message}</p>
+		<h1>${escapeHtml(title)}</h1>
+		<p>${escapeHtml(message)}</p>
 		<p><a href="https://undocustudent.org">Return to UndocuStudent.org</a></p>
 	</main>
 </body>
