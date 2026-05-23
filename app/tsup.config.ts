@@ -12,7 +12,6 @@ export default defineConfig({
 	entry: [
 		'scripts/email-outreach.ts',
 		'scripts/email-followup.ts',
-		'scripts/mint-edit-token.ts',
 		'scripts/verify-addresses.ts',
 		'scripts/import-reoon-csv.ts',
 		'scripts/preview-emails.ts',

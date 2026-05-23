@@ -26,34 +26,26 @@ export function generateFollowupEmail(
 		authSecret
 	);
 
-	const subject = `Following up: ${sanitizeSubjectPart(college.name)}'s policies for undocumented students`;
+	// Mirrors the original outreach subject so the follow-up threads in Gmail/Outlook.
+	// Keep this in sync with generateOutreachEmail's subject in emailRenderers.ts.
+	const subject = `Re: Help undocumented students learn about ${sanitizeSubjectPart(college.name)}'s policies`;
 
-	const text = `Hi,
+	const text = `quick follow-up to my note.
 
-I reached out a couple of weeks ago about ${college.name}'s policies for undocumented students on undocustudent.org. I wanted to follow up in case the original message got buried.
+The previous edit link asked you to sign in. This one opens the form pre-authenticated for your inbox, no account needed:
+${editUrl}
 
-I built this directory to help undocumented students understand admissions, financial aid, and student life at prospective schools, and ${college.name}'s page is still missing verified information. Even a few details would make a meaningful difference for students researching their options.
+ Thanks!
 
-The link below opens a pre-authorized edit form for your inbox — no account needed. It takes a few minutes.
-
-Update ${college.name}'s page: ${editUrl}
-
-If someone else on your team is a better fit, feel free to forward this along. And of course you can reply directly with the information and I'll add it myself.
-
-Thanks,
 ${SENDER_NAME}
-UndocuStudent.org
 `;
 
-	const escapedName = escapeHtml(college.name);
 	const escapedSender = escapeHtml(SENDER_NAME);
-	const html = `<p>Hi,</p>
-<p>I reached out a couple of weeks ago about ${escapedName}'s policies for undocumented students on undocustudent.org. I wanted to follow up in case the original message got buried.</p>
-<p>I built this directory to help undocumented students understand admissions, financial aid, and student life at prospective schools, and ${escapedName}'s page is still missing verified information. Even a few details would make a meaningful difference for students researching their options.</p>
-<p>The link below opens a pre-authorized edit form for your inbox — no account needed. It takes a few minutes.</p>
-<p><a href="${editUrl}">Update ${escapedName}'s page</a></p>
-<p>If someone else on your team is a better fit, feel free to forward this along. And of course you can reply directly with the information and I'll add it myself.</p>
-<p>Thanks,<br />${escapedSender}<br />UndocuStudent.org</p>
+	const html = `<p>quick follow-up to my note.</p>
+<p>The previous edit link asked you to sign in. This one opens the form pre-authenticated for your inbox, no account needed:</p>
+<p><a href="${editUrl}">${editUrl}</a></p>
+<p>Thanks!</p>
+<p>${escapedSender}</p>
 `;
 
 	return { subject, html, text };
