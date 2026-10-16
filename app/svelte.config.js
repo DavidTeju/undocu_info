@@ -21,11 +21,6 @@ const config = {
 					'sha256-7dQwUgLau1NFCCGjfn9FsYptB6ZtWxJin6VohGIu20I=',
 					'https://analytics.davidteju.dev'
 				]
-			},
-			// must be specified with either the `report-uri` or `report-to` directives, or both
-			reportOnly: {
-				'script-src': ['self'],
-				'report-uri': ['/']
 			}
 		}
 	}

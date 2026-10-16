@@ -18,3 +18,11 @@ describe('Umami tracking', () => {
 		expect(config.kit?.csp?.directives?.['script-src']).toContain(origin);
 	});
 });
+
+describe('Content Security Policy', () => {
+	// Nothing collects violation reports; a report-only policy just makes every
+	// page view POST reports to a route that answers 405.
+	it('has no report-only policy', () => {
+		expect(config.kit?.csp?.reportOnly).toBeUndefined();
+	});
+});
