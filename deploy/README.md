@@ -14,7 +14,8 @@ VPS (82.29.152.139)
 │
 ├── /srv/undocustudent/             # Application (no source: CI builds the image)
 │   ├── .env                        # App config, mode 600 (connects to supabase_default network)
-│   └── DEPLOYED_SHA                # Commit that is live
+│   ├── DEPLOYED_SHA                # Commit that is live
+│   └── supabase/                   # Supabase CLI state and January 2026 backups (mode 700)
 │
 ├── /root/supabase-backups/         # Automated backups
 │   ├── db_YYYYMMDD_HHMMSS.sql.gz
