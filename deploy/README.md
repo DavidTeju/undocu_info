@@ -24,28 +24,28 @@ VPS (82.29.152.139)
 └── /etc/nginx/                     # Reverse proxy (git tracked)
     ├── conf.d/geoip-blocking.conf  # GeoIP country blocking
     ├── snippets/geoip-block.conf   # Blocking rule snippet
-    └── sites-available/undocustudent  # All domains:
-        ├── undocustudent.org       # Main app (:4173)
-        ├── files.undocustudent.org # API + storage (:8000)
-        ├── studio.undocustudent.org # Supabase Studio (:3001)
-        └── analytics.undocustudent.org # Umami (:3002)
+    ├── sites-available/undocustudent  # UndocuStudent domains:
+    │   ├── undocustudent.org       # Main app (:4173)
+    │   ├── files.undocustudent.org # API + storage (:8000)
+    │   └── studio.undocustudent.org # Supabase Studio (:3001)
+    └── sites-available/analytics   # analytics.davidteju.dev → Umami (:3002)
 ```
 
 ## Key Services
 
-| Service            | Internal Port | Binding         | External URL                        |
-| ------------------ | ------------- | --------------- | ----------------------------------- |
-| Kong (API Gateway) | 8000          | 127.0.0.1:8000  | https://files.undocustudent.org     |
-| Kong (HTTPS)       | 8443          | 127.0.0.1:8443  | -                                   |
-| PostgreSQL         | 5432          | 127.0.0.1:5432  | -                                   |
-| Supavisor (Pooler) | 6543          | 127.0.0.1:6543  | SSH tunnel for external connections |
-| GoTrue (Auth)      | 9999          | not exposed     | via Kong                            |
-| Storage            | 5000          | not exposed     | via Kong                            |
-| imgproxy           | 5001          | not exposed     | via Kong                            |
-| Analytics          | 4000          | 127.0.0.1:4000  | -                                   |
-| Studio             | 3001          | 127.0.0.1:3001  | https://studio.undocustudent.org    |
-| Umami Analytics    | 3002          | 127.0.0.1:3002  | https://analytics.undocustudent.org |
-| App                | 4173          | 127.0.0.1:4173  | https://undocustudent.org           |
+| Service            | Internal Port | Binding        | External URL                        |
+| ------------------ | ------------- | -------------- | ----------------------------------- |
+| Kong (API Gateway) | 8000          | 127.0.0.1:8000 | https://files.undocustudent.org     |
+| Kong (HTTPS)       | 8443          | 127.0.0.1:8443 | -                                   |
+| PostgreSQL         | 5432          | 127.0.0.1:5432 | -                                   |
+| Supavisor (Pooler) | 6543          | 127.0.0.1:6543 | SSH tunnel for external connections |
+| GoTrue (Auth)      | 9999          | not exposed    | via Kong                            |
+| Storage            | 5000          | not exposed    | via Kong                            |
+| imgproxy           | 5001          | not exposed    | via Kong                            |
+| Analytics          | 4000          | 127.0.0.1:4000 | -                                   |
+| Studio             | 3001          | 127.0.0.1:3001 | https://studio.undocustudent.org    |
+| Umami Analytics    | 3002          | 127.0.0.1:3002 | https://analytics.davidteju.dev     |
+| App                | 4173          | 127.0.0.1:4173 | https://undocustudent.org           |
 
 All services are bound to `127.0.0.1` so they are only reachable via nginx (or SSH tunnel). Only ports 22, 80, and 443 are publicly accessible.
 
@@ -163,11 +163,11 @@ umami:
 
 ## Umami Analytics
 
-Frontend analytics at https://analytics.undocustudent.org
+Frontend analytics at https://analytics.davidteju.dev
 
 - Uses separate `umami` database in PostgreSQL
 - Tracking script in `app/src/app.html`
-- Dashboard: https://analytics.undocustudent.org (login required)
+- Dashboard: https://analytics.davidteju.dev (login required)
 
 ## Email Configuration
 
