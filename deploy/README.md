@@ -153,6 +153,8 @@ umami:
     DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/umami
     DATABASE_TYPE: postgresql
     APP_SECRET: ${UMAMI_APP_SECRET}
+    # Website icons in the dashboard. DuckDuckGo's default service skips SVG icons.
+    FAVICON_URL: "https://www.google.com/s2/favicons?domain={{domain}}&sz=64"
   depends_on:
     db:
       condition: service_healthy
