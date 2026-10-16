@@ -12,10 +12,9 @@ VPS (82.29.152.139)
 │   └── volumes/
 │       └── storage/                # File storage (campuses bucket)
 │
-├── /root/undocu_info/              # Application
-│   └── app/
-│       ├── .env                    # App config (connects to supabase_default network)
-│       └── Dockerfile
+├── /srv/undocustudent/             # Application (no source: CI builds the image)
+│   ├── .env                        # App config, mode 600 (connects to supabase_default network)
+│   └── DEPLOYED_SHA                # Commit that is live
 │
 ├── /root/supabase-backups/         # Automated backups
 │   ├── db_YYYYMMDD_HHMMSS.sql.gz
@@ -30,6 +29,29 @@ VPS (82.29.152.139)
     │   └── studio.undocustudent.org # Supabase Studio (:3001)
     └── sites-available/analytics   # analytics.davidteju.dev → Umami (:3002)
 ```
+
+## Deploys
+
+Every push to `main` runs `.github/workflows/deploy.yml`: lint and type-check, build the image
+from `app/` and push it to `ghcr.io/davidteju/undocu_info:<sha>`, then deploy it. The deploy job
+logs in as the VPS's `deploy` user with the `DEPLOY_SSH_KEY` secret. That key's forced command
+can only run `deploy-app undocustudent stage|deploy <sha>`; it cannot open a shell or forward
+ports. `deploy-app` pulls the image with the job's own token, runs `prisma migrate deploy` in it,
+swaps the `undocu_app` container, and checks it answers on :4173. The image that was live is
+kept as `undocu_app:previous`.
+
+The three `PUBLIC_*` build arguments are repository variables; they ship in the browser bundle.
+Runtime secrets stay in `/srv/undocustudent/.env` on the VPS and never reach GitHub.
+
+On the VPS (`ssh projects`):
+
+```bash
+sudo deploy-app undocustudent rollback   # swap back to undocu_app:previous
+sudo docker inspect undocu_app --format '{{index .Config.Labels "deployed-sha"}}'
+```
+
+`deploy-app` and the `deploy` user are documented in the
+[projects-vps handbook](https://github.com/DavidTeju/projects-vps#deploys).
 
 ## Key Services
 
