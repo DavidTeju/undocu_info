@@ -385,11 +385,11 @@
 		onclick={() => (showConfirmModal = false)}
 		onkeydown={(e) => e.key === 'Escape' && (showConfirmModal = false)}
 	>
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<div
 			class="modal"
 			role="dialog"
 			aria-modal="true"
+			tabindex="-1"
 			aria-labelledby="modal-title"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
