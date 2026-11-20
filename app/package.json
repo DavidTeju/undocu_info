@@ -39,7 +39,7 @@
 	"devDependencies": {
 		"@davidteju/dev-config": "github:DavidTeju/dev-config",
 		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/kit": "^2.5.27",
+		"@sveltejs/kit": "^2.70.4",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"@types/eslint": "^9.6.0",
 		"@types/eslint-config-prettier": "^6.11.3",
@@ -69,7 +69,7 @@
 		"@prisma/client": "^6.3.1",
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.47.10",
-		"@sveltejs/adapter-node": "^5.2.12",
+		"@sveltejs/adapter-node": "^5.5.8",
 		"@tailwindcss/vite": "^4.0.0",
 		"anchorme": "^3.0.8",
 		"dotenv": "^16.4.7",

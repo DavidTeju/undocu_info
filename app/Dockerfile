@@ -34,7 +34,8 @@ RUN npm run scripts:build
 FROM node:24-alpine
 WORKDIR /usr/local/app
 
-RUN apk add --no-cache openssl
+# Alpine's security fixes. npm stays: deploy-app runs `npx prisma migrate deploy` in this image.
+RUN apk upgrade --no-cache && apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV PORT=4173
